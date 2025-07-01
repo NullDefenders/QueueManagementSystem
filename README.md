@@ -1,1 +1,1 @@
-# QueueManagementSystem
+# Электронная очередь
