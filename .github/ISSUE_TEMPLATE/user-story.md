@@ -1,5 +1,5 @@
 ---
-name: "\U0001F4CB User Story"
+name: User Story
 about: Создать пользовательскую историю
 title: 'US-XXX: '
 labels: type:user-story
