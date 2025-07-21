@@ -16,9 +16,6 @@ assignees: ''
 - [ ] Задача 2
 - [ ] Задача 3
 
-## Epic
-[название эпика]
-
 ## Связанные задачи
 - Relates to: #[номер User Story]
 - Blocks: #[номер User Story]
