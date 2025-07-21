@@ -19,16 +19,6 @@ assignees: ''
 ## Epic
 [название эпика]
 
-## Priority
-- [ ] MVP
-- [ ] Nice to have
-
-## Definition of Done
-- [ ] Код написан и соответствует стандартам
-- [ ] Тесты написаны и проходят
-- [ ] Code review выполнен
-- [ ] Документация обновлена
-
 ## Связанные задачи
 - Relates to: #[номер User Story]
 - Blocks: #[номер User Story]
