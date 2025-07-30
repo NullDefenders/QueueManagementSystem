@@ -202,14 +202,14 @@ graph TB
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Authorized : UC-01: Авторизация
-    Authorized --> ReadyToWork : UC-02: Начать работу
-    ReadyToWork --> WaitingAssignment : UC-03: Запросить клиента
+    [*] --> Authorized : UC-01 Авторизация
+    Authorized --> ReadyToWork : UC-02 Начать работу
+    ReadyToWork --> WaitingAssignment : UC-03 Запросить клиента
     WaitingAssignment --> WaitingClient : Клиент назначен
-    WaitingClient --> ServingClient : UC-04: Начать обслуживание
-    WaitingClient --> ReadyToWork : UC-04: Клиент не подошел
-    ServingClient --> ReadyToWork : UC-05: Завершить обслуживание
-    ReadyToWork --> Closed : UC-06: Закрыть интерфейс
+    WaitingClient --> ServingClient : UC-04 Начать обслуживание
+    WaitingClient --> ReadyToWork : UC-04 Клиент не подошел
+    ServingClient --> ReadyToWork : UC-05 Завершить обслуживание
+    ReadyToWork --> Closed : UC-06 Закрыть интерфейс
     Closed --> [*]
 ```
 
