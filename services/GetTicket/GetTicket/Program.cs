@@ -1,25 +1,22 @@
+using GetTicket.Models;
+using GetTicket.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Настройка конфигурации MongoDB
+builder.Services.Configure<TicketDatabaseSettings>(
+    builder.Configuration.GetSection("TicketDatabaseSettings"));
+
+builder.Services.AddSingleton<GetTicket.Services.TicketService>();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
