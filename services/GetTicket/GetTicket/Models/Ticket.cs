@@ -6,7 +6,7 @@ namespace GetTicket.Models
     public class Ticket
     {
         [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
+        [BsonRepresentation(BsonType.Int32)]
         public required int Id { get; set; }
 
         public required string TicketNumber { get; set; }
