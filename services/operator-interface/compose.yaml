@@ -1,0 +1,13 @@
+﻿services:
+  mockoperatorauthorizationservice:
+    image: mockoperatorauthorizationservice
+    build:
+      context: .
+      dockerfile: src/MockOperatorAuthorizationService/Dockerfile
+
+  grpcservice1:
+    image: grpcservice1
+    build:
+      context: .
+      dockerfile: GrpcService1/Dockerfile
+

@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option csharp_namespace = "MockOperatorAuthorizationService.Grpc";
+
+service OperatorAuthorizationService {
+  rpc AuthorizeOperator(AuthorizeOperatorRequest) returns (AuthorizeOperatorResponse);
+  rpc IsSessionActive(SessionValidationRequest) returns (SessionValidationResponse);
+}
+
+message AuthorizeOperatorRequest {
+  string operator_login = 1;
+  string workplace_code = 2;
+  string password = 3;
+}
+
+message AuthorizeOperatorResponse {
+  string session_id = 1;
+  string operator_login = 2;
+  string full_name = 3;
+  WindowAssignment window_assignment = 4;
+  repeated ServiceTopic service_topics = 5;
+}
+
+message WindowAssignment {
+  string window_code = 1;
+  string window_display_name = 2;
+  string location = 3;
+}
+
+message ServiceTopic {
+  string topic_code = 1;
+  string topic_name = 2;
+}
+
+message SessionValidationRequest {
+  string session_id = 1;
+}
+
+message SessionValidationResponse {
+  bool is_active = 1;
+  string reason = 2;
+}
