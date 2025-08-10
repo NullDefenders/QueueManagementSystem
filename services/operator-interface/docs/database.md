@@ -19,17 +19,38 @@ erDiagram
     }
     
     client_sessions {
-        integer id PK
+        uuid id PK
         uuid operator_session_id FK
         varchar(50) ticket_number
         timestamptz assignment_time
-        timestamptz service_start_time
-        timestamptz service_end_time
+        timestamptz start_time
+        timestamptz end_time
         text result
     }
     
-    operator_sessions ||--o{ client_sessions : "имеет много"
-    operator_sessions ||--o| client_sessions : "текущий клиент"
+    operator_sessions ||--o{ client_sessions : "1..* обслуживает клиентов"
+    operator_sessions ||--o| client_sessions : "0..1 текущий клиент"
+```
+
+## Визуализация связей
+
+```
+┌─────────────────────────┐           ┌─────────────────────────┐
+│    operator_sessions    │ 1       * │    client_sessions      │
+│─────────────────────────│◄──────────┤─────────────────────────│
+│ id (PK)                 │           │ id (PK)                 │
+│ operator_id             │           │ operator_session_id (FK)│
+│ workplace_code          │           │ ticket_number           │
+│ status                  │           │ assignment_time         │
+│ session_start_time      │           │ start_time              │
+│ session_end_time        │           │ end_time                │
+│ assigned_services[]     │           │ result                  │
+│ current_client_session  │─┐    ┌────┴─────────────────────────┘
+└─────────────────────────┘ │    │
+                            │ 0..1
+                            └────┘
+                         указывает на
+                       текущего клиента
 ```
 
 ## Описание таблиц
@@ -39,7 +60,7 @@ erDiagram
 
 | Колонка | Тип | Описание |
 |---------|-----|----------|
-| `id` | `uuid` | Первичный ключ, автогенерируемый |
+| `session_id` | `uuid` | Первичный ключ, уникальный идентификатор сессии |
 | `operator_id` | `varchar(100)` | Идентификатор оператора (бизнес-ключ) |
 | `workplace_code` | `varchar(50)` | Код сервисного окна/рабочего места |
 | `status` | `text` | Статус сессии: `Authorized`, `ReadyToWork`, `WaitingAssignment`, `WaitingClient`, `ServingClient`, `Closed` |
@@ -53,7 +74,7 @@ erDiagram
 
 | Колонка | Тип | Описание |
 |---------|-----|----------|
-| `id` | `uuid` | Первичный ключ, автогенерируемый |
+| `id` | `integer` | Первичный ключ, автогенерируемый |
 | `operator_session_id` | `uuid` | FK к сессии оператора |
 | `ticket_number` | `varchar(50)` | Номер талона клиента в очереди |
 | `assignment_time` | `timestamptz` | Время назначения клиента оператору |
@@ -70,6 +91,23 @@ erDiagram
   - Указывает на текущую активную сессию клиента (если есть)
   - Использует `ON DELETE SET NULL` для корректной очистки
 
+## Индексы
+
+## Ограничения
+
+### Внешние ключи
+```sql
+-- Сессии клиентов принадлежат сессиям операторов
+ALTER TABLE client_sessions 
+    ADD CONSTRAINT fk_client_sessions_operator_sessions_operator_session_id 
+    FOREIGN KEY (operator_session_id) REFERENCES operator_sessions (session_id) ON DELETE CASCADE;
+
+-- Ссылка на текущую сессию клиента
+ALTER TABLE operator_sessions 
+    ADD CONSTRAINT fk_operator_sessions_client_sessions_current_client_session_id 
+    FOREIGN KEY (current_client_session_id) REFERENCES client_sessions (id) ON DELETE SET NULL;
+```
+
 ## Типы данных и особенности
 
 ### Специфичные для PostgreSQL возможности
@@ -83,7 +121,7 @@ erDiagram
 #### Сессия оператора
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "session_id": "550e8400-e29b-41d4-a716-446655440000",
   "operator_id": "OP123",
   "workplace_code": "ОКНО_01", 
   "status": "ServingClient",
@@ -94,7 +132,7 @@ erDiagram
     },
     {
       "ServiceCode": "VISA",
-      "ServiceName": "Визовые услуги"
+      "ServiceName": "Визовые услуги"  
     }
   ]
 }
@@ -103,7 +141,7 @@ erDiagram
 #### Сессия клиента
 ```json
 {
-  "id": "01989543-a8b9-7656-8370-79be6825fe27",
+  "id": "0198954b-ca35-753d-b1d8-536954b32520",
   "operator_session_id": "550e8400-e29b-41d4-a716-446655440000",
   "ticket_number": "A001",
   "assignment_time": "2025-08-10T10:30:00Z",
