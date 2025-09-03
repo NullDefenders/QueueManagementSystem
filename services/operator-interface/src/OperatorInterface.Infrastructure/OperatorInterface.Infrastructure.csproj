@@ -7,6 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Google.Protobuf" Version="3.32.0" />
+      <PackageReference Include="Grpc.Net.Client" Version="2.64.0" />
+      <PackageReference Include="Grpc.Tools" Version="2.72.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
         <PrivateAssets>all</PrivateAssets>
@@ -21,6 +27,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\OperatorInterface.Core\OperatorInterface.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Protobuf Include="Adapters\Grpc\AuthorizationService\Contract.proto" />
     </ItemGroup>
 
 </Project>

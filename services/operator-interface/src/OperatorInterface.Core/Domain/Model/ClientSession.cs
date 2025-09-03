@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using CSharpFunctionalExtensions;
 using OperatorInterface.Core.Domain.Model.Exceptions;
 using OperatorInterface.Core.Domain.SharedKernel;
 
@@ -60,5 +61,5 @@ public class ClientSession : Entity<Guid>
 
     public bool IsActive => StartTime != null && EndTime == null;
     public bool IsCompleted => EndTime != null;
-    public bool IsAssignedButNotStarted => StartTime == null && Result == null;
+    public bool IsAssigned => Result == null;
 }

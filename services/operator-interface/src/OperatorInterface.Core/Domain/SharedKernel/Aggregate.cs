@@ -1,4 +1,4 @@
-﻿using OperatorInterface.Core.Domain.Model.DomainEvents;
+﻿using CSharpFunctionalExtensions;
 
 namespace OperatorInterface.Core.Domain.SharedKernel;
 

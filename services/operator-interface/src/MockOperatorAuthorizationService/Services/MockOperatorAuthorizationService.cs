@@ -1,5 +1,6 @@
-﻿using Grpc.Core;
-using MockOperatorAuthorizationService.Grpc;
+﻿using Authorization;
+using Authorization.Grpc;
+using Grpc.Core;
 using MockOperatorAuthorizationService.Models;
 
 namespace MockOperatorAuthorizationService.Services;
@@ -68,12 +69,12 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
         ServerCallContext context)
     {
         _logger.LogInformation("Authorization attempt for operator: {Login}, workplace: {Workplace}",
-            request.OperatorLogin, request.WorkplaceCode);
+            request.Login, request.Workplace);
 
         await Task.Delay(500); // Имитация задержки
 
         // Валидация входных данных
-        if (string.IsNullOrWhiteSpace(request.OperatorLogin))
+        if (string.IsNullOrWhiteSpace(request.Login))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Логин не может быть пустым"));
         }
@@ -83,15 +84,15 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Пароль не может быть пустым"));
         }
 
-        if (string.IsNullOrWhiteSpace(request.WorkplaceCode))
+        if (string.IsNullOrWhiteSpace(request.Workplace))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Код рабочего места не может быть пустым"));
         }
 
         // Поиск оператора
-        if (!MockOperators.TryGetValue(request.OperatorLogin.ToLowerInvariant(), out var mockOperator))
+        if (!MockOperators.TryGetValue(request.Login.ToLowerInvariant(), out var mockOperator))
         {
-            _logger.LogWarning("Operator not found: {Login}", request.OperatorLogin);
+            _logger.LogWarning("Operator not found: {Login}", request.Login);
             
             throw new RpcException(new Status(StatusCode.Unauthenticated, "Неверный логин или пароль"));
         }
@@ -99,7 +100,7 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
         // Проверка пароля
         if (mockOperator.Password != request.Password)
         {
-            _logger.LogWarning("Invalid password for operator: {Login}", request.OperatorLogin);
+            _logger.LogWarning("Invalid password for operator: {Login}", request.Login);
             
             var trailers = new Metadata
             {
@@ -115,7 +116,7 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
         // Проверка активности оператора
         if (!mockOperator.IsActive)
         {
-            _logger.LogWarning("Operator is inactive: {Login}", request.OperatorLogin);
+            _logger.LogWarning("Operator is inactive: {Login}", request.Login);
             
             var trailers = new Metadata
             {
@@ -130,10 +131,10 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
         }
 
         // Проверка рабочего места
-        if (mockOperator.AssignedWorkplace != request.WorkplaceCode.ToUpperInvariant())
+        if (mockOperator.AssignedWorkplace != request.Workplace.ToUpperInvariant())
         {
             _logger.LogWarning("Workplace mismatch for operator {Login}. Expected: {Expected}, Actual: {Actual}",
-                request.OperatorLogin, mockOperator.AssignedWorkplace, request.WorkplaceCode);
+                request.Login, mockOperator.AssignedWorkplace, request.Workplace);
             
             var trailers = new Metadata
             {
@@ -141,7 +142,7 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
                 { "operator-name", mockOperator.FullName },
                 { "assigned-workplace", mockOperator.AssignedWorkplace },
                 { "assigned-window", mockOperator.WindowDisplayName },
-                { "current-workplace", request.WorkplaceCode }
+                { "current-workplace", request.Workplace }
             };
             
             throw new RpcException(
@@ -150,12 +151,12 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
         }
 
         // Проверка неизвестного рабочего места
-        if (!IsValidWorkplace(request.WorkplaceCode))
+        if (!IsValidWorkplace(request.Workplace))
         {
             var trailers = new Metadata
             {
                 { "error-code", "WORKPLACE_NOT_FOUND" },
-                { "requested-workplace", request.WorkplaceCode },
+                { "requested-workplace", request.Workplace },
                 { "available-workplaces", "WP001,WP002,WP003,WP005,WP007" }
             };
             
@@ -165,7 +166,7 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
         }
 
         // Успешная авторизация - создаем сессию
-        var sessionId = Guid.NewGuid().ToString();
+        var sessionId = Guid.CreateVersion7().ToString();
         ActiveSessions[sessionId] = new ActiveSession
         {
             SessionId = sessionId,
@@ -175,24 +176,19 @@ public class MockOperatorAuthorizationService : OperatorAuthorizationService.Ope
         };
 
         _logger.LogInformation("Successful authorization for operator: {Login}, session: {SessionId}",
-            request.OperatorLogin, sessionId);
+            request.Login, sessionId);
 
         return new AuthorizeOperatorResponse
         {
             SessionId = sessionId,
-            OperatorLogin = mockOperator.Login,
+            Login = mockOperator.Login,
             FullName = mockOperator.FullName,
+            AssignedWorkplace = mockOperator.AssignedWorkplace,
             WindowAssignment = new WindowAssignment
             {
                 WindowCode = mockOperator.WindowCode,
                 WindowDisplayName = mockOperator.WindowDisplayName,
                 Location = mockOperator.Location
-            },
-            ServiceTopics =
-            {
-                new ServiceTopic { TopicCode = "PASSPORT_SERVICES", TopicName = "Паспортные услуги" },
-                new ServiceTopic { TopicCode = "DOCUMENT_CONSULTATION", TopicName = "Консультации по документам" },
-                new ServiceTopic { TopicCode = "CERTIFICATES", TopicName = "Справки и выписки" }
             }
         };
     }

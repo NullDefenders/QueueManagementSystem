@@ -2,8 +2,7 @@
 
 namespace OperatorInterface.Core.Domain.Model.DomainEvents;
 
-public record WorkSessionStarted(
-    DateTime OccurredAt,
+public record OperatorSessionOpened(
     SessionId SessionId,
     DateTime StartTime
-) : DomainEvent(OccurredAt, SessionId);
+) : DomainEvent;

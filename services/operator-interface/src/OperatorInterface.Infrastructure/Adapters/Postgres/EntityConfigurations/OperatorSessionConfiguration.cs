@@ -45,37 +45,13 @@ public class OperatorSessionConfiguration : IEntityTypeConfiguration<OperatorSes
 
         builder.Property(x => x.SessionEndTime)
             .HasColumnName("session_end_time");
-
-
+        
         // Configure AssignedServices as PostgreSQL array of custom type
         builder.OwnsMany(x => x.AssignedServices, j =>
         {
             j.ToJson("assigned_services");
         });
-
-/*
-// Current client session reference
-builder.Property<int?>("_currentClientSessionId")
-    .HasColumnName("current_client_session_id");
-*/
         
-        
-/*        
-        // Configure ClientSessions relationship
-        builder.HasMany(s => s.ClientSessionsInternal)
-            .WithOne()
-            .HasForeignKey("operator_session_id")
-            .OnDelete(DeleteBehavior.Cascade);
-*/            
-/*
-        // Configure CurrentClientSession relationship  
-        builder.HasOne(s => s.CurrentClientSession)
-            .WithMany()
-            .HasForeignKey("_currentClientSessionId")
-            .OnDelete(DeleteBehavior.SetNull);
-*/
-        // Ignore domain events
-        //builder.Ignore(x => x.DomainEvents);
-        //builder.Ignore(x => x.CurrentClientSession);
+        builder.Ignore(x => x.CurrentClientSession);
     }
 }

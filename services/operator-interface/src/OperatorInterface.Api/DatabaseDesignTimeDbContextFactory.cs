@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿/*
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using OperatorInterface.Infrastructure.Adapters.Postgres;
 
@@ -14,3 +15,4 @@ public class DatabaseDesignTimeDbContextFactory
         return new ApplicationDbContext(builder.Options);
     }
 }
+*/

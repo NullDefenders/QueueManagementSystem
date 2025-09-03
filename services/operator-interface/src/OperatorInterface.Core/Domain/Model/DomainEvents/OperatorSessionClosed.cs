@@ -2,9 +2,8 @@
 
 namespace OperatorInterface.Core.Domain.Model.DomainEvents;
 
-public record WorkSessionClosed(
-    DateTime OccurredAt,
+public record OperatorSessionClosed(
     SessionId SessionId,
     DateTime EndTime,
     TimeSpan SessionDuration
-) : DomainEvent(OccurredAt, SessionId);
+) : DomainEvent;

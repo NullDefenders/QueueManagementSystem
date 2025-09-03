@@ -7,8 +7,6 @@ namespace OperatorInterface.Core.Domain.Model;
 
 public class OperatorSession : Aggregate<Guid>
 {
-    private ClientSession? _currentClientSession;
-
     public SessionId SessionId => new SessionId(Id);
     public OperatorId OperatorId { get; }
     public WorkplaceCode WorkplaceCode { get; }
@@ -16,8 +14,8 @@ public class OperatorSession : Aggregate<Guid>
     public DateTime? SessionStartTime { get; private set; }
     public DateTime? SessionEndTime { get; private set; }
     public IReadOnlyList<ServiceInfo> AssignedServices { get; private set; }
-    public List<ClientSession> ClientSessions { get; private set; } 
-    public ClientSession? CurrentClientSession => _currentClientSession;
+    public List<ClientSession> ClientSessions { get; private set; }
+    public ClientSession? CurrentClientSession => ClientSessions?.SingleOrDefault(x => x.IsAssigned);
 
     /// <summary>
     /// For EF
@@ -38,8 +36,7 @@ public class OperatorSession : Aggregate<Guid>
         Status = SessionStatus.Authorized;
         ClientSessions = new();
         
-        RaiseDomainEvent(new OperatorAuthorized(
-            DateTime.UtcNow,
+        RaiseDomainEvent(new OperatorSessionCreated(
             SessionId,
             OperatorId,
             WorkplaceCode,
@@ -59,7 +56,7 @@ public class OperatorSession : Aggregate<Guid>
         return new OperatorSession(operatorId, workplaceCode, assignedServices);
     }
 
-    public void StartWork()
+    public void OpenSession()
     {
         if (Status != SessionStatus.Authorized)
             throw new InvalidSessionStateException("StartWork", Status);
@@ -67,8 +64,7 @@ public class OperatorSession : Aggregate<Guid>
         Status = SessionStatus.ReadyToWork;
         SessionStartTime = DateTime.UtcNow;
 
-        RaiseDomainEvent(new WorkSessionStarted(
-            DateTime.UtcNow,
+        RaiseDomainEvent(new OperatorSessionOpened(
             SessionId,
             SessionStartTime.Value
         ));
@@ -82,7 +78,6 @@ public class OperatorSession : Aggregate<Guid>
         Status = SessionStatus.WaitingAssignment;
 
         RaiseDomainEvent(new ClientRequested(
-            DateTime.UtcNow,
             SessionId
         ));
     }
@@ -91,19 +86,17 @@ public class OperatorSession : Aggregate<Guid>
     {
         if (Status != SessionStatus.WaitingAssignment)
             throw new InvalidSessionStateException("AssignClient", Status);
-/*
-        if (_currentClientSession != null)
+
+        if (CurrentClientSession != null)
             throw new OperatorDomainException("Cannot assign new client - current client session is not completed");
-*/
+
         var assignmentTime = DateTime.UtcNow;
         var clientSession = new ClientSession(ticketNumber, assignmentTime);
         ClientSessions.Add(clientSession);
-        //_currentClientSession = clientSession;
 
         Status = SessionStatus.WaitingClient;
 
         RaiseDomainEvent(new ClientAssigned(
-            DateTime.UtcNow,
             SessionId,
             ticketNumber,
             assignmentTime
@@ -115,17 +108,17 @@ public class OperatorSession : Aggregate<Guid>
         if (Status != SessionStatus.WaitingClient)
             throw new InvalidSessionStateException("StartClientSession", Status);
 
-        if (_currentClientSession == null)
+        if (CurrentClientSession == null)
             throw new OperatorDomainException("No client assigned for session");
 
-        _currentClientSession.StartSession();
+        var clientSession = CurrentClientSession;
+        clientSession.StartSession();
         Status = SessionStatus.ServingClient;
 
         RaiseDomainEvent(new ClientSessionStarted(
-            DateTime.UtcNow,
             SessionId,
-            _currentClientSession.TicketNumber,
-            _currentClientSession.StartTime!.Value
+            clientSession.TicketNumber,
+            clientSession.StartTime!.Value
         ));
     }
 
@@ -134,21 +127,19 @@ public class OperatorSession : Aggregate<Guid>
         if (Status != SessionStatus.ServingClient)
             throw new InvalidSessionStateException("CompleteClientSession", Status);
 
-        if (_currentClientSession == null)
+        if (CurrentClientSession == null)
             throw new OperatorDomainException("No active client session to complete");
 
-        var serviceDuration = _currentClientSession.CompleteSession();
+        var clientSession = CurrentClientSession;
+        var serviceDuration = clientSession.CompleteSession();
         Status = SessionStatus.ReadyToWork;
 
         RaiseDomainEvent(new ClientSessionCompleted(
-            DateTime.UtcNow,
             SessionId,
-            _currentClientSession.TicketNumber,
-            _currentClientSession.EndTime!.Value,
+            clientSession.TicketNumber,
+            clientSession.EndTime!.Value,
             serviceDuration
         ));
-
-        _currentClientSession = null; // Завершили обслуживание
     }
 
     public void MarkClientAsNotCame(string reason = "Client did not come to the window")
@@ -156,25 +147,23 @@ public class OperatorSession : Aggregate<Guid>
         if (Status != SessionStatus.WaitingClient)
             throw new InvalidSessionStateException("MarkClientAsNotCame", Status);
 
-        if (_currentClientSession == null)
+        if (CurrentClientSession == null)
             throw new OperatorDomainException("No client assigned to mark as not came");
 
-        _currentClientSession.MarkAsNotCame(reason);
+        var currentSession = CurrentClientSession;
+        currentSession.MarkAsNotCame(reason);
         Status = SessionStatus.ReadyToWork;
 
         RaiseDomainEvent(new ClientDidNotCome(
-            DateTime.UtcNow,
             SessionId,
-            _currentClientSession.TicketNumber,
+            currentSession.TicketNumber,
             reason
         ));
-
-        _currentClientSession = null; // Клиент не пришел
     }
 
     public void CloseSession()
     {
-        if (Status == SessionStatus.ServingClient)
+        if (Status != SessionStatus.ReadyToWork)
             throw new InvalidSessionStateException("CloseSession", Status);
 
         Status = SessionStatus.Closed;
@@ -182,8 +171,7 @@ public class OperatorSession : Aggregate<Guid>
 
         var sessionDuration = SessionEndTime.Value - SessionStartTime!.Value;
 
-        RaiseDomainEvent(new WorkSessionClosed(
-            DateTime.UtcNow,
+        RaiseDomainEvent(new OperatorSessionClosed(
             SessionId,
             SessionEndTime.Value,
             sessionDuration

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.EntityFrameworkCore;
 using OperatorInterface.Core.Domain.Model;
 using OperatorInterface.Core.Domain.SharedKernel;
 using OperatorInterface.Core.Ports;
@@ -32,5 +33,19 @@ public class OperatorSessionRepository : IOperatorSessionRepository
         {
             _context.OperatorSessions.Update(session);
             return Task.CompletedTask;
+        }
+
+        public async Task<Maybe<SessionId>> FindActiveSession(OperatorId operatorId)
+        {
+            var activeSessionId = await _context.OperatorSessions
+                .Where(s => s.OperatorId == operatorId && s.Status != SessionStatus.Closed)
+                .OrderByDescending(s => s.SessionStartTime ?? DateTime.MinValue)
+                .Select(x=> (Guid?) x.Id)
+                .FirstOrDefaultAsync();
+            
+            if (activeSessionId == null)
+                return  null;
+            
+            return new SessionId(activeSessionId.Value);
         }
     }

@@ -12,7 +12,7 @@ using OperatorInterface.Infrastructure.Adapters.Postgres;
 namespace OperatorInterface.Infrastructure.Adapters.Postgres.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250810181705_Init")]
+    [Migration("20250902172946_Init")]
     partial class Init
     {
         /// <inheritdoc />

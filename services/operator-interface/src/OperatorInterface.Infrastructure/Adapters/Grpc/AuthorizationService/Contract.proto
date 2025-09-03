@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option csharp_namespace = "Authorization.Grpc";
+
+service OperatorAuthorizationService {
+  rpc AuthorizeOperator(AuthorizeOperatorRequest) returns (AuthorizeOperatorResponse);
+  rpc IsSessionActive(SessionValidationRequest) returns (SessionValidationResponse);
+}
+
+message AuthorizeOperatorRequest {
+  string workplace = 1;
+  string login = 2;
+  string password = 3;
+}
+
+message AuthorizeOperatorResponse {
+  string session_id = 1;
+  string login = 2;
+  string assigned_workplace = 3;
+  string full_name = 4;
+  WindowAssignment window_assignment = 5;
+}
+
+message WindowAssignment {
+  string window_code = 1;
+  string window_display_name = 2;
+  string location = 3;
+}
+
+message SessionValidationRequest {
+  string session_id = 1;
+}
+
+message SessionValidationResponse {
+  bool is_active = 1;
+  string reason = 2;
+}

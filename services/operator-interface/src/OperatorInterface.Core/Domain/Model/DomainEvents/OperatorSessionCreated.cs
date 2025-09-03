@@ -2,10 +2,9 @@
 
 namespace OperatorInterface.Core.Domain.Model.DomainEvents;
 
-public record OperatorAuthorized(
-    DateTime OccurredAt,
+public record OperatorSessionCreated(
     SessionId SessionId,
     OperatorId OperatorId,
     WorkplaceCode WorkplaceCode,
     List<ServiceInfo> AssignedServices
-) : DomainEvent(OccurredAt, SessionId);
+) : DomainEvent;

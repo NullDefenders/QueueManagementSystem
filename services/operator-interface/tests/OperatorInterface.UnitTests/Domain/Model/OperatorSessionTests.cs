@@ -35,7 +35,7 @@ public class OperatorSessionShould
         Assert.Null(session.CurrentClientSession);
         Assert.Empty(session.ClientSessions);
         Assert.Single(session.GetDomainEvents());
-        Assert.IsType<OperatorAuthorized>(session.GetDomainEvents().First());
+        Assert.IsType<OperatorSessionCreated>(session.GetDomainEvents().First());
     }
 
     [Fact]
@@ -69,12 +69,12 @@ public class OperatorSessionShould
         var session = CreateAuthorizedSession();
 
         // Act
-        session.StartWork();
+        session.OpenSession();
 
         // Assert
         Assert.Equal(SessionStatus.ReadyToWork, session.Status);
         Assert.NotNull(session.SessionStartTime);
-        Assert.Contains(session.GetDomainEvents(), e => e is WorkSessionStarted);
+        Assert.Contains(session.GetDomainEvents(), e => e is OperatorSessionOpened);
     }
 
     [Fact]
@@ -82,10 +82,10 @@ public class OperatorSessionShould
     {
         // Arrange
         var session = CreateAuthorizedSession();
-        session.StartWork(); // Move to ReadyToWork
+        session.OpenSession(); // Move to ReadyToWork
 
         // Act & Assert
-        var exception = Assert.Throws<InvalidSessionStateException>(() => session.StartWork());
+        var exception = Assert.Throws<InvalidSessionStateException>(() => session.OpenSession());
         Assert.Contains("StartWork", exception.Message);
         Assert.Contains("ReadyToWork", exception.Message);
     }
@@ -254,7 +254,7 @@ public class OperatorSessionShould
     }
 
     [Fact]
-    public void CloseSession_WhenStatusIsNotServingClient()
+    public void EndWork_WhenStatusIsNotServingClient()
     {
         // Arrange
         var session = CreateReadyToWorkSession();
@@ -265,7 +265,7 @@ public class OperatorSessionShould
         // Assert
         Assert.Equal(SessionStatus.Closed, session.Status);
         Assert.NotNull(session.SessionEndTime);
-        Assert.Contains(session.GetDomainEvents(), e => e is WorkSessionClosed);
+        Assert.Contains(session.GetDomainEvents(), e => e is OperatorSessionClosed);
     }
 
     [Fact]
@@ -357,7 +357,7 @@ public class OperatorSessionShould
             _validAssignedServices);
 
         // Act - Complete workflow
-        session.StartWork();
+        session.OpenSession();
         session.RequestClient();
         session.AssignClient(_validTicketNumber);
         session.StartClientSession();
@@ -366,13 +366,13 @@ public class OperatorSessionShould
 
         // Assert
         var events = session.GetDomainEvents();
-        Assert.Contains(events, e => e is OperatorAuthorized);
-        Assert.Contains(events, e => e is WorkSessionStarted);
+        Assert.Contains(events, e => e is OperatorSessionCreated);
+        Assert.Contains(events, e => e is OperatorSessionOpened);
         Assert.Contains(events, e => e is ClientRequested);
         Assert.Contains(events, e => e is ClientAssigned);
         Assert.Contains(events, e => e is ClientSessionStarted);
         Assert.Contains(events, e => e is ClientSessionCompleted);
-        Assert.Contains(events, e => e is WorkSessionClosed);
+        Assert.Contains(events, e => e is OperatorSessionClosed);
     }
 
     [Fact]
@@ -380,7 +380,7 @@ public class OperatorSessionShould
     {
         // Arrange
         var session = CreateAuthorizedSession();
-        session.StartWork(); // Generate some events
+        session.OpenSession(); // Generate some events
 
         // Act
         session.ClearDomainEvents();
@@ -409,7 +409,7 @@ public class OperatorSessionShould
 
         // Act & Assert - Authorized → ReadyToWork
         Assert.Equal(SessionStatus.Authorized, session.Status);
-        session.StartWork();
+        session.OpenSession();
         Assert.Equal(SessionStatus.ReadyToWork, session.Status);
 
         // Act & Assert - ReadyToWork → WaitingAssignment
@@ -461,7 +461,7 @@ public class OperatorSessionShould
     private OperatorSession CreateReadyToWorkSession()
     {
         var session = CreateAuthorizedSession();
-        session.StartWork();
+        session.OpenSession();
         session.ClearDomainEvents();
         return session;
     }

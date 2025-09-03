@@ -82,8 +82,10 @@ namespace OperatorInterface.IntegrationTests.Repositories
             Assert.Contains(savedServices, s => s.ServiceCode == "S002");
         }
         
-        [Fact]
-        public async Task UpdateExistingSession_WhenValidSessionProvided()
+        [
+        
+            Fact]
+        public async Task Maintain_Session_History()
         {
             // Arrange - Save initial session
             var session = OperatorSession.Create(
@@ -98,24 +100,30 @@ namespace OperatorInterface.IntegrationTests.Repositories
             await unitOfWork.SaveChangesAsync();
             
             // Modify session state
-            session.StartWork();
+            session.OpenSession();
             session.RequestClient();
             session.AssignClient(_testTicketNumber);
-
-            // Act - Update the session
+            session.StartClientSession();
+            session.CompleteClientSession();
+            
             await repository.UpdateAsync(session);
-
             await unitOfWork.SaveChangesAsync();
             
             // Assert - Verify session was updated correctly
             var updatedSession = await repository.GetByIdAsync(session.SessionId);
             
+            // Modify session state
+            updatedSession.RequestClient();
+            updatedSession.AssignClient(_testTicketNumber);
+            updatedSession.StartClientSession();
+            updatedSession.CompleteClientSession();
+            
+            await repository.UpdateAsync(session);
+            await unitOfWork.SaveChangesAsync();
+            
             Assert.NotNull(updatedSession);
-            Assert.Equal(SessionStatus.WaitingClient, updatedSession.Status);
-            Assert.NotNull(updatedSession.SessionStartTime);
-            Assert.Single(updatedSession.ClientSessions);
-            //Assert.NotNull(updatedSession.CurrentClientSession);
-            //Assert.Equal(_testTicketNumber, updatedSession.CurrentClientSession.TicketNumber);
+            Assert.Equal(SessionStatus.ReadyToWork, updatedSession.Status);
+            Assert.Equal(2, updatedSession.ClientSessions.Count);
         }
 /*
         [Fact]

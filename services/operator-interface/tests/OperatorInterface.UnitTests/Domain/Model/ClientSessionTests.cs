@@ -21,7 +21,7 @@ public class ClientSessionShould
         Assert.Null(clientSession.StartTime);
         Assert.Null(clientSession.EndTime);
         Assert.Null(clientSession.Result);
-        Assert.True(clientSession.IsAssignedButNotStarted);
+        Assert.True(clientSession.IsAssigned);
         Assert.False(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
     }
@@ -41,7 +41,7 @@ public class ClientSessionShould
         Assert.Null(clientSession.Result);
         Assert.True(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.True(clientSession.IsAssigned);
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class ClientSessionShould
         Assert.Equal(ClientSessionResult.ServiceCompleted, clientSession.Result);
         Assert.True(clientSession.IsCompleted);
         Assert.False(clientSession.IsActive);
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.False(clientSession.IsAssigned);
         Assert.True(duration >= TimeSpan.Zero);
         Assert.Equal(clientSession.EndTime.Value - startTime, duration);
     }
@@ -117,7 +117,7 @@ public class ClientSessionShould
         Assert.Null(clientSession.EndTime);
         Assert.False(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.False(clientSession.IsAssigned);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class ClientSessionShould
         var clientSession = new ClientSession(_validTicketNumber, _validAssignmentTime);
 
         // Act & Assert
-        Assert.True(clientSession.IsAssignedButNotStarted);
+        Assert.True(clientSession.IsAssigned);
         Assert.False(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
     }
@@ -154,7 +154,7 @@ public class ClientSessionShould
 
         // Act & Assert
         Assert.True(clientSession.IsActive);
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.True(clientSession.IsAssigned);
         Assert.False(clientSession.IsCompleted);
     }
 
@@ -169,7 +169,7 @@ public class ClientSessionShould
         // Act & Assert
         Assert.True(clientSession.IsCompleted);
         Assert.False(clientSession.IsActive);
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.False(clientSession.IsAssigned);
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public class ClientSessionShould
         // Act & Assert
         Assert.False(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.False(clientSession.IsAssigned);
         Assert.Equal(ClientSessionResult.ClientNotCame, clientSession.Result);
     }
 
@@ -234,19 +234,19 @@ public class ClientSessionShould
         var clientSession = new ClientSession(_validTicketNumber, _validAssignmentTime);
 
         // Act & Assert - Initial state
-        Assert.True(clientSession.IsAssignedButNotStarted);
+        Assert.True(clientSession.IsAssigned);
         Assert.False(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
 
         // Act & Assert - Start session
         clientSession.StartSession();
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.True(clientSession.IsAssigned);
         Assert.True(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
 
         // Act & Assert - Complete session
         clientSession.CompleteSession();
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.False(clientSession.IsAssigned);
         Assert.False(clientSession.IsActive);
         Assert.True(clientSession.IsCompleted);
         Assert.Equal(ClientSessionResult.ServiceCompleted, clientSession.Result);
@@ -259,11 +259,11 @@ public class ClientSessionShould
         var clientSession = new ClientSession(_validTicketNumber, _validAssignmentTime);
 
         // Act & Assert - Initial state
-        Assert.True(clientSession.IsAssignedButNotStarted);
+        Assert.True(clientSession.IsAssigned);
 
         // Act & Assert - Mark as not came
         clientSession.MarkAsNotCame("Client never arrived");
-        Assert.False(clientSession.IsAssignedButNotStarted);
+        Assert.False(clientSession.IsAssigned);
         Assert.False(clientSession.IsActive);
         Assert.False(clientSession.IsCompleted);
         Assert.Equal(ClientSessionResult.ClientNotCame, clientSession.Result);
