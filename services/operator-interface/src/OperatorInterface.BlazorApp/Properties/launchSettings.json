@@ -5,18 +5,22 @@
         "commandName": "Project",
         "dotnetRunMessages": true,
         "launchBrowser": true,
-        "applicationUrl": "http://localhost:5280",
+        "applicationUrl": "http://localhost:5186",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "CONNECTION_STRING": "Server=localhost;Port=5432;User Id=postgres;Password=postgres;Database=operator_interface;",
+          "AUTH_SERVICE_GRPC_HOST": "http://localhost:5001"
         }
       },
       "https": {
         "commandName": "Project",
         "dotnetRunMessages": true,
         "launchBrowser": true,
-        "applicationUrl": "https://localhost:7058;http://localhost:5280",
+        "applicationUrl": "https://localhost:7249;http://localhost:5186",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "CONNECTION_STRING": "Server=localhost;Port=5432;User Id=postgres;Password=postgres;Database=operator_interface;",
+          "AUTH_SERVICE_GRPC_HOST": "https://localhost:5001"
         }
       }
     }

@@ -1,0 +1,255 @@
+﻿@using OperatorInterface.Core.Domain.SharedKernel
+@using OperatorInterface.Queries.UseCases.Shared
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="card-title mb-0">
+            <i class="bi bi-clock-history"></i> История клиентов
+        </h6>
+        @if (ClientSessions.Any())
+        {
+            <div class="btn-group btn-group-sm" role="group">
+                <button type="button"
+                        class="btn @(sortOrder == SortOrder.Newest ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="() => SetSortOrder(SortOrder.Newest)">
+                    <i class="bi bi-sort-down"></i> Новые
+                </button>
+                <button type="button"
+                        class="btn @(sortOrder == SortOrder.Oldest ? "btn-primary" : "btn-outline-primary")"
+                        @onclick="() => SetSortOrder(SortOrder.Oldest)">
+                    <i class="bi bi-sort-up"></i> Старые
+                </button>
+            </div>
+        }
+    </div>
+    <div class="card-body">
+        @if (ClientSessions.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th scope="col">Талон</th>
+                            <th scope="col">Назначен</th>
+                            <th scope="col">Начало</th>
+                            <th scope="col">Окончание</th>
+                            <th scope="col">Статус</th>
+                            <th scope="col" class="text-center">Длительность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var session in SortedSessions)
+                        {
+                            <tr class="@GetRowClass(session)">
+                                <td>
+                                    <span class="badge @GetTicketBadgeClass(session)">
+                                        @session.TicketNumber
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        @session.AssignmentTime.ToString("HH:mm:ss")
+                                    </small>
+                                </td>
+                                <td>
+                                    @if (session.ServiceStartTime.HasValue)
+                                    {
+                                        <small class="text-muted">
+                                            @session.ServiceStartTime.Value.ToString("HH:mm:ss")
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (session.ServiceEndTime.HasValue)
+                                    {
+                                        <small class="text-muted">
+                                            @session.ServiceEndTime.Value.ToString("HH:mm:ss")
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @GetStatusBadgeClass(session)">
+                                        <i class="bi @GetStatusIcon(session)"></i>
+                                        @GetStatusText(session)
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="@GetDurationClass(session)">
+                                        @GetDurationText(session)
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-3 pt-3 border-top">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <small class="text-muted">Всего записей</small>
+                        <div class="fw-semibold">@ClientSessions.Count</div>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Обслужено</small>
+                        <div class="fw-semibold text-success">@CompletedCount</div>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted">Не явились</small>
+                        <div class="fw-semibold text-warning">@NotCameCount</div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="text-muted mb-2">История клиентов пуста</h6>
+                <p class="text-muted small mb-0">
+                    Клиенты еще не обслуживались в этой смене
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private enum SortOrder { Newest, Oldest }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<ClientSessionDto> ClientSessions { get; set; } = new List<ClientSessionDto>();
+
+    private SortOrder sortOrder = SortOrder.Newest;
+
+    private IEnumerable<ClientSessionDto> SortedSessions =>
+        sortOrder == SortOrder.Newest
+            ? ClientSessions.OrderByDescending(cs => cs.AssignmentTime)
+            : ClientSessions.OrderBy(cs => cs.AssignmentTime);
+
+    private int CompletedCount =>
+        ClientSessions.Count(cs => cs.Result == ClientSessionResult.ServiceCompleted);
+
+    private int NotCameCount =>
+        ClientSessions.Count(cs => cs.Result == ClientSessionResult.ClientNotCame);
+
+    private void SetSortOrder(SortOrder newOrder)
+    {
+        sortOrder = newOrder;
+    }
+
+    private string GetRowClass(ClientSessionDto session)
+    {
+        if (session.IsActive)
+            return "table-primary";
+
+        return session.Result switch
+        {
+            ClientSessionResult.ServiceCompleted => "table-success-subtle",
+            ClientSessionResult.ClientNotCame => "table-warning-subtle",
+            _ => ""
+        };
+    }
+
+    private string GetTicketBadgeClass(ClientSessionDto session)
+    {
+        if (session.IsActive)
+            return "bg-primary";
+
+        return session.Result switch
+        {
+            ClientSessionResult.ServiceCompleted => "bg-success",
+            ClientSessionResult.ClientNotCame => "bg-warning",
+            _ => "bg-secondary"
+        };
+    }
+
+    private string GetStatusBadgeClass(ClientSessionDto session)
+    {
+        if (session.IsActive)
+            return "bg-primary";
+
+        return session.Result switch
+        {
+            ClientSessionResult.ServiceCompleted => "bg-success",
+            ClientSessionResult.ClientNotCame => "bg-warning text-dark",
+            _ => "bg-info"
+        };
+    }
+
+    private string GetStatusIcon(ClientSessionDto session)
+    {
+        if (session.IsActive)
+            return "bi-person-workspace";
+
+        return session.Result switch
+        {
+            ClientSessionResult.ServiceCompleted => "bi-check-circle",
+            ClientSessionResult.ClientNotCame => "bi-person-x",
+            _ => "bi-clock"
+        };
+    }
+
+    private string GetStatusText(ClientSessionDto session)
+    {
+        if (session.IsActive)
+            return "Обслуживается";
+
+        return session.Result switch
+        {
+            ClientSessionResult.ServiceCompleted => "Обслужен",
+            ClientSessionResult.ClientNotCame => "Не пришел",
+            _ => "Ожидает"
+        };
+    }
+
+    private string GetDurationClass(ClientSessionDto session)
+    {
+        if (session.IsActive)
+            return "text-primary fw-semibold";
+
+        return session.Result switch
+        {
+            ClientSessionResult.ServiceCompleted => "text-success",
+            ClientSessionResult.ClientNotCame => "text-warning",
+            _ => "text-muted"
+        };
+    }
+
+    private string GetDurationText(ClientSessionDto session)
+    {
+        if (session.ServiceStartTime.HasValue && session.ServiceEndTime.HasValue)
+        {
+            var duration = session.ServiceEndTime.Value - session.ServiceStartTime.Value;
+            return FormatDuration(duration);
+        }
+
+        if (session.ServiceStartTime.HasValue && session.IsActive)
+        {
+            var duration = DateTime.Now - session.ServiceStartTime.Value;
+            return $"{FormatDuration(duration)} ⏱️";
+        }
+
+        return "-";
+    }
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+            return $"{duration.Hours:D2}:{duration.Minutes:D2}:{duration.Seconds:D2}";
+
+        if (duration.TotalMinutes >= 1)
+            return $"{duration.Minutes:D2}:{duration.Seconds:D2}";
+
+        return $"{duration.Seconds}с";
+    }
+}

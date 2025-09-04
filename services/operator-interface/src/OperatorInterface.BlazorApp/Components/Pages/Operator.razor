@@ -1,0 +1,220 @@
+﻿@rendermode InteractiveServer
+@page "/operator"
+@using MediatR
+@using OperatorInterface.BlazorApp.Services
+@using OperatorInterface.Core.Application.UseCases.Commands.AssignClient
+@using OperatorInterface.Core.Application.UseCases.Commands.CloseOperatorSession
+@using OperatorInterface.Core.Application.UseCases.Commands.CompleteClientSession
+@using OperatorInterface.Core.Application.UseCases.Commands.MarkClientAsNotCame
+@using OperatorInterface.Core.Application.UseCases.Commands.OpenOperatorSession
+@using OperatorInterface.Core.Application.UseCases.Commands.RequestClient
+@using OperatorInterface.Core.Application.UseCases.Commands.StartClientSession
+@using OperatorInterface.Queries.UseCases.GetOperatorSession
+@using OperatorInterface.Queries.UseCases.Shared
+@inherits AuthenticatedPageComponent
+@inject IMediator Mediator
+@inject NotificationService NotificationService
+@implements IAsyncDisposable
+
+<PageTitle>Рабочее место оператора</PageTitle>
+
+@if (!IsSessionReady)
+{
+    @RenderAuthCheck()
+}
+else if (currentSession == null)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="text-muted">Загрузка данных сессии...</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row g-4">
+            <!-- Header and session status -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <i class="bi bi-display"></i>
+                                    Рабочее место: @currentSession.WorkplaceCode.Value
+                                </h5>
+                                <small class="text-muted">
+                                    Сессия: @currentSession.SessionId.Value.ToString()[..8]...
+                                </small>
+                            </div>
+                            <SessionStatusBadge Status="@currentSession.Status" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session statistics -->
+            <div class="col-12">
+                <SessionStatistics Session="@currentSession" />
+            </div>
+
+            <!-- Session controls and assigned services -->
+            <div class="col-lg-8">
+                <SessionControls Session="@currentSession"
+                                 OnStartWork="@HandleStartWork"
+                                 OnRequestClient="@HandleRequestClient"
+                                 OnStartClientSession="@HandleStartClientSession"
+                                 OnCompleteClientSession="@HandleCompleteClientSession"
+                                 OnMarkClientNotCame="@HandleMarkClientNotCame"
+                                 OnCloseSession="@HandleCloseSession"
+                                 IsLoading="@isLoading" />
+            </div>
+
+            <div class="col-lg-4">
+                <AssignedServices Services="@currentSession.AssignedServices" />
+            </div>
+
+            <!-- Client history -->
+            <div class="col-12">
+                <ClientHistory ClientSessions="@currentSession.ClientSessions" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private OperatorSessionDto? currentSession;
+    private bool isLoading = false;
+    private Timer? refreshTimer;
+
+    protected override async Task OnSessionReadyAsync()
+    {
+        if (SessionStorage.CurrentSessionId != null)
+        {
+            await LoadSession();
+            StartRefreshTimer();
+        }
+    }
+
+    private async Task LoadSession()
+    {
+        if (SessionStorage.CurrentSessionId == null) return;
+
+        try
+        {
+            currentSession = await Mediator.Send(new GetOperatorSessionQuery(SessionStorage.CurrentSessionId));
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            await NotificationService.ShowErrorAsync($"Ошибка загрузки сессии: {ex.Message}");
+        }
+    }
+
+    private void StartRefreshTimer()
+    {
+        refreshTimer = new Timer(async _ =>
+        {
+            await LoadSession();
+        }, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+    }
+
+    private async Task HandleStartWork()
+    {
+        await ExecuteAction(async () =>
+        {
+            await Mediator.Send(new OpenOperatorSessionCommand(SessionStorage.CurrentSessionId!));
+            await NotificationService.ShowSuccessAsync("Рабочая смена началась");
+        });
+    }
+
+    private async Task HandleRequestClient()
+    {
+        await ExecuteAction(async () =>
+        {
+            await Mediator.Send(new RequestClientCommand(SessionStorage.CurrentSessionId!));
+            await NotificationService.ShowInfoAsync("Запрос на назначение клиента отправлен");
+            
+            // Simulate queue system assigning client after a delay
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(2000, CancellationToken.None);
+                
+                // временно назначаем клиента
+                await Mediator.Send(new AssignClientCommand(SessionStorage.CurrentSessionId!, $"A{DateTime.Now:HHmmss}"));
+            });
+        });
+    }
+
+    private async Task HandleStartClientSession()
+    {
+        await ExecuteAction(async () =>
+        {
+            await Mediator.Send(new StartClientSessionCommand(SessionStorage.CurrentSessionId!));
+            await NotificationService.ShowSuccessAsync("Обслуживание клиента начато");
+        });
+    }
+
+    private async Task HandleCompleteClientSession()
+    {
+        await ExecuteAction(async () =>
+        {
+            await Mediator.Send(new CompleteClientSessionCommand(SessionStorage.CurrentSessionId!));
+            await NotificationService.ShowSuccessAsync("Обслуживание завершено");
+        });
+    }
+
+    private async Task HandleMarkClientNotCame()
+    {
+        var reason = "Клиент не подошел к окну";
+        await ExecuteAction(async () =>
+        {
+            await Mediator.Send(new MarkClientAsNotCameCommand(SessionStorage.CurrentSessionId!, reason));
+            await NotificationService.ShowWarningAsync("Клиент отмечен как не пришедший");
+        });
+    }
+
+    private async Task HandleCloseSession()
+    {
+        await ExecuteAction(async () =>
+        {
+            await Mediator.Send(new CloseOperatorSessionCommand(SessionStorage.CurrentSessionId!));
+            await NotificationService.ShowInfoAsync("Рабочая смена завершена");
+            SessionStorage.Clear();
+            Navigation.NavigateTo("/login", replace: true);
+        });
+    }
+
+    private async Task ExecuteAction(Func<Task> action)
+    {
+        if (isLoading) return;
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            await action();
+            await Task.Delay(500);
+            await LoadSession();
+        }
+        catch (Exception ex)
+        {
+            await NotificationService.ShowErrorAsync($"Ошибка: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        refreshTimer?.Dispose();
+    }
+}

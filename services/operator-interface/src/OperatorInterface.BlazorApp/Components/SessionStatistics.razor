@@ -1,0 +1,75 @@
+﻿@using OperatorInterface.Core.Domain.SharedKernel
+@using OperatorInterface.Queries.UseCases.Shared
+<div class="card">
+    <div class="card-header">
+        <h6 class="card-title mb-0">
+            <i class="bi bi-bar-chart-line"></i> Статистика смены
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row g-3 text-center">
+            <div class="col-6 col-lg-3">
+                <div class="border-end border-light-subtle">
+                    <div class="d-flex flex-column align-items-center">
+                        <span class="display-6 text-primary mb-1">@Session.ClientSessions.Count</span>
+                        <small class="text-muted">Всего клиентов</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="border-end border-light-subtle">
+                    <div class="d-flex flex-column align-items-center">
+                        <span class="display-6 text-success mb-1">@CompletedCount</span>
+                        <small class="text-muted">Обслужено</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="border-end border-light-subtle">
+                    <div class="d-flex flex-column align-items-center">
+                        <span class="display-6 text-warning mb-1">@NotCameCount</span>
+                        <small class="text-muted">Не пришли</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="d-flex flex-column align-items-center">
+                    <span class="display-6 text-info mb-1">@WorkTimeDisplay</span>
+                    <small class="text-muted">Время работы</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public OperatorSessionDto Session { get; set; } = default!;
+
+    private int CompletedCount =>
+        Session.ClientSessions.Count(cs => cs.Result == ClientSessionResult.ServiceCompleted);
+
+    private int NotCameCount =>
+        Session.ClientSessions.Count(cs => cs.Result == ClientSessionResult.ClientNotCame);
+
+    private string WorkTimeDisplay
+    {
+        get
+        {
+            if (Session.SessionStartTime == null) return "-";
+
+            var workTime = DateTime.UtcNow - Session.SessionStartTime.Value;
+            return FormatDuration(workTime);
+        }
+    }
+
+    private static string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+            return $"{duration.Hours}ч {duration.Minutes}м";
+        return $"{duration.Minutes}м";
+    }
+}

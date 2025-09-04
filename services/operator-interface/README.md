@@ -17,6 +17,16 @@
 - [📊 Схема базы данных](docs/database.md)
 - [🏗️ Архитектура системы](docs/architecture.md)
 
-## Запуск проекта
+## Построение проекта
 - [](docs/build.md)
+
+## Запуск из Docker Compose
+
+Postgres доступен Server=postgres; Port=5432; User Id=postgres;Password=postgres; Database=operator_interface
+Мок для Сервис авторизации доступен по http://localhost:5001/
+
+Blazor UI доступен по адресу http://localhost:8083/ (health - http://localhost:8083/health)
+API доступен по адресу http://localhost:8081/ (health - http://localhost:8081/health)
+
+
 

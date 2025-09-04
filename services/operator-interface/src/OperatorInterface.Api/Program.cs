@@ -60,7 +60,7 @@ builder.Services.AddScoped<IQueueService, QueueService>();
 // Repositories
 builder.Services.AddScoped<IOperatorSessionRepository, OperatorSessionRepository>(); 
 
-// Mediator (TODO: одумать как от него избавиться)
+// Mediator (TODO: подумать как от него избавиться)
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
@@ -102,11 +102,10 @@ if (app.Environment.IsDevelopment())
 else
     app.UseHsts();
 
-app.UseHealthChecks("/health");
 app.UseRouting();
 
 app.UseCors();
-app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+app.MapControllers();
 
 // Apply Migrations
 
@@ -115,5 +114,17 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 }
+
+app.UseHealthChecks("/health");
+
+// ✅ Простой endpoint для проверки статуса
+app.MapGet("/api/status", () => Results.Ok(new 
+{ 
+    Status = "Running", 
+    Version = "2.0", 
+    Framework = ".NET 9",
+    Environment = app.Environment.EnvironmentName,
+    Timestamp = DateTime.UtcNow 
+}));
 
 app.Run();

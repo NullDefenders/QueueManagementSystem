@@ -1,0 +1,162 @@
+﻿@page "/login"
+@inject IMediator Mediator
+@inject SessionStorageService SessionStorage
+@inject NavigationManager Navigation
+@inject NotificationService NotificationService
+@using System.ComponentModel.DataAnnotations
+@using OperatorInterface.BlazorApp.Services
+@using OperatorInterface.Core.Application.UseCases.Commands.AuthorizeOperator
+@using MediatR
+@using OperatorInterface.Core.Domain.Model.Exceptions
+
+@rendermode InteractiveServer
+
+<PageTitle>Авторизация оператора</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4>
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Авторизация оператора
+                </h4>
+            </div>
+            <div class="card-body">
+                <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label class="form-label" for="login">Логин оператора</label>
+                        <InputText id="login"
+                                   class="form-control"
+                                   @bind-Value="loginModel.Login"
+                                   placeholder="Введите логин"
+                                   disabled="@isLoading" />
+                        <ValidationMessage For="@(() => loginModel.Login)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Пароль</label>
+                        <InputText id="password"
+                                   type="password"
+                                   class="form-control"
+                                   @bind-Value="loginModel.Password"
+                                   placeholder="Введите пароль"
+                                   disabled="@isLoading" />
+                        <ValidationMessage For="@(() => loginModel.Password)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="workplace">Код рабочего места</label>
+                        <InputText id="workplace"
+                                   class="form-control"
+                                   @bind-Value="loginModel.WorkplaceCode"
+                                   placeholder="Например: WP001"
+                                   disabled="@isLoading" />
+                        <ValidationMessage For="@(() => loginModel.WorkplaceCode)" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            @errorMessage
+                        </div>
+                    }
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2"
+                                      role="status"
+                                      aria-hidden="true"></span>
+                            }
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </button>
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                @onclick="ClearForm"
+                                disabled="@isLoading">
+                            <i class="bi bi-arrow-clockwise"></i> Очистить
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private bool isLoading = false;
+    private string errorMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        if (SessionStorage.IsLoggedIn)
+        {
+            Navigation.NavigateTo("/operator", replace: true);
+            return;
+        }
+
+        // Fill test data for demo
+        loginModel.Login = "ivanov";
+        loginModel.Password = "password123";
+        loginModel.WorkplaceCode = "WP005";
+    }
+
+    private async Task HandleLogin()
+    {
+        if (isLoading) return;
+
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            var sessionId = await Mediator.Send(new AuthorizeOperatorCommand(
+                loginModel.Login!,
+                loginModel.Password!,
+                loginModel.WorkplaceCode!));
+
+            SessionStorage.CurrentSessionId = sessionId;
+
+            await NotificationService.ShowSuccessAsync($"Добро пожаловать, {loginModel.Login}!");
+
+            Navigation.NavigateTo("/operator", replace: true);
+        }
+        catch (AuthorizationFailedException ex)
+        {
+            errorMessage = $"Ошибка авторизации: {ex.Message}";
+            await NotificationService.ShowErrorAsync(errorMessage);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Произошла ошибка: {ex.Message}";
+            await NotificationService.ShowErrorAsync(errorMessage);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ClearForm()
+    {
+        loginModel = new LoginModel();
+        errorMessage = string.Empty;
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Логин обязателен")]
+        public string? Login { get; set; }
+
+        [Required(ErrorMessage = "Пароль обязателен")]
+        public string? Password { get; set; }
+
+        [Required(ErrorMessage = "Код рабочего места обязателен")]
+        public string? WorkplaceCode { get; set; }
+    }
+}

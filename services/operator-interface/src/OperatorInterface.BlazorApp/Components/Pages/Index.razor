@@ -1,0 +1,40 @@
+﻿@rendermode InteractiveServer
+@page "/"
+@using OperatorInterface.BlazorApp.Services
+@inject SessionStorageService SessionStorage
+@inject NavigationManager Navigation
+
+<PageTitle>Интерфейс оператора - Главная</PageTitle>
+
+@if (isInitializing)
+{
+    <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="text-muted">Проверка статуса авторизации...</p>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isInitializing = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SessionStorage.InitializeAfterRenderAsync();
+            
+            if (SessionStorage.IsLoggedIn)
+            {
+                Navigation.NavigateTo("/operator", replace: true);
+            }
+            else
+            {
+                Navigation.NavigateTo("/login", replace: true);
+            }
+        }
+    }
+}
