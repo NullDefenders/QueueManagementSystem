@@ -5,10 +5,6 @@ namespace DirectoryService.Models.DTOs
     /// <summary>
     /// DTO для ответа с информацией об услугах подразделения
     /// </summary>
-<<<<<<< HEAD
-=======
-    /// 
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
     public class DepartmentServicesResponseDto
     {
         /// <summary>
@@ -36,6 +32,9 @@ namespace DirectoryService.Models.DTOs
             [Display(Name = "Название категории услуги")]
             public string CategoryName { get; }
 
+            [Display(Name = "Префикс категории услуги")]
+            public string CategoryPrefix { get; }
+
             [Display(Name = "ID услуги")]
             public Guid ServiceId { get; }
 
@@ -49,6 +48,7 @@ namespace DirectoryService.Models.DTOs
                 Guid categoryId,
                 string categoryCode,
                 string categoryName,
+                string categoryPrefix,
                 Guid serviceId,
                 string serviceCode,
                 string serviceName)
@@ -56,6 +56,7 @@ namespace DirectoryService.Models.DTOs
                 CategoryId = categoryId;
                 CategoryCode = categoryCode;
                 CategoryName = categoryName;
+                CategoryPrefix = categoryPrefix;
                 ServiceId = serviceId;
                 ServiceCode = serviceCode;
                 ServiceName = serviceName;

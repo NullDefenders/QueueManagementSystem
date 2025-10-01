@@ -13,7 +13,6 @@ namespace DirectoryService.Repositories
             _dbContext = context;
         }
 
-<<<<<<< HEAD
         public async Task<IEnumerable<Department>> GetFacilityDepartmentsAsync(Guid facilityId)
         {
             return await _dbContext.Departments
@@ -21,8 +20,6 @@ namespace DirectoryService.Repositories
                 .ToListAsync();
         }
 
-=======
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
         public async Task<IEnumerable<Schedule>> GetDepartmentSchedulesAsync(Guid departmentId)
         {
             return await _dbContext.Schedules
@@ -56,14 +53,8 @@ namespace DirectoryService.Repositories
         }
 
         public async Task<bool> DepartmentExistsAsync(Guid departmentId)
-<<<<<<< HEAD
         {
             return await _dbContext.Departments.AnyAsync(d => d.Id == departmentId);
-        }
-=======
-       {
-            return await _dbContext.Departments.AnyAsync(d => d.Id == departmentId);
-       }
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
+        }  
     }
 }

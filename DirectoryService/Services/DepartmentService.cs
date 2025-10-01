@@ -1,8 +1,4 @@
 ﻿using DirectoryService.Models.DTOs;
-<<<<<<< HEAD
-using DirectoryService.Models.Entities;
-=======
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 using DirectoryService.Repositories;
 
 namespace DirectoryService.Services
@@ -10,7 +6,6 @@ namespace DirectoryService.Services
     public class DepartmentService : IDepartmentService
     {
         private readonly IDepartmentRepository _departmentRepository;
-<<<<<<< HEAD
         private readonly IFacilityRepository _facilityRepository;
 
         public DepartmentService(
@@ -37,12 +32,11 @@ namespace DirectoryService.Services
                     allowScheduledAppointments: d.AllowScheduledAppointments
                 )).ToList()
             );
-=======
+        }
 
         public DepartmentService(IDepartmentRepository departmentRepository)
         {
             _departmentRepository = departmentRepository;
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
         }
 
         public async Task<DepartmentSchedulesResponseDto?> GetDepartmentSchedulesAsync(Guid departmentId)
@@ -91,6 +85,7 @@ namespace DirectoryService.Services
                             s.ServiceCategory.Id,
                             s.ServiceCategory.Code,
                             s.ServiceCategory.Name,
+                            s.ServiceCategory.Prefix,
                             s.Id,
                             s.Code,
                             s.Name))
@@ -111,6 +106,7 @@ namespace DirectoryService.Services
                     categoryId: service.ServiceCategory.Id,
                     categoryCode: service.ServiceCategory.Code,
                     categoryName: service.ServiceCategory.Name,
+                    categoryPrefix: service.ServiceCategory.Prefix,
                     serviceId: service.Id,
                     serviceCode: service.Code,
                     serviceName: service.Name

@@ -11,11 +11,7 @@ namespace DirectoryService.Models.DTOs
         /// Список рабочих мест подразделения
         /// </summary>
         [Display(Name = "Список окон подразделения")]
-<<<<<<< HEAD
         public List<WorkplaceDto> Workplaces { get; }
-=======
-        public List<WorkplaceDto> Workplaces { get; set; }
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 
         public DepartmentWorkplacesResponseDto(List<WorkplaceDto> workplaces)
         {
@@ -31,41 +27,25 @@ namespace DirectoryService.Models.DTOs
             /// Уникальный идентификатор окна
             /// </summary>
             [Display(Name = "Уникальный идентификатор окна")]
-<<<<<<< HEAD
             public Guid Id { get; }
-=======
-            public Guid Id { get; set; }
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 
             /// <summary>
             /// Уникальный код окна
             /// </summary>
             [Display(Name = "Уникальный код окна")]
-<<<<<<< HEAD
             public string Code { get; }
-=======
-            public string Code { get; set; }
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 
             /// <summary>
             /// Название окна
             /// </summary>
             [Display(Name = "Название окна")]
-<<<<<<< HEAD
             public string Name { get; }
-=======
-            public string Name { get; set; }
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 
             /// <summary>
             /// Список услуг, оказываемых окном
             /// </summary>
             [Display(Name = "Услуги, оказываемые окном")]
-<<<<<<< HEAD
             public List<ServiceInfoDto> Services { get; }
-=======
-            public List<ServiceInfoDto> Services { get; set; }
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 
             public WorkplaceDto(Guid id, string code, string name, List<ServiceInfoDto> services)
             {
@@ -82,7 +62,6 @@ namespace DirectoryService.Models.DTOs
         public class ServiceInfoDto
         {
             [Display(Name = "ID категории услуги")]
-<<<<<<< HEAD
             public Guid CategoryId { get; }
 
             [Display(Name = "Код категории услуги")]
@@ -90,6 +69,9 @@ namespace DirectoryService.Models.DTOs
 
             [Display(Name = "Название категории услуги")]
             public string CategoryName { get; }
+
+            [Display(Name = "Префис категории услуги")]
+            public string CategoryPrefix { get; }
 
             [Display(Name = "ID услуги")]
             public Guid ServiceId { get; }
@@ -99,29 +81,12 @@ namespace DirectoryService.Models.DTOs
 
             [Display(Name = "Название услуги")]
             public string ServiceName { get; }
-=======
-            public Guid CategoryId { get; set; }
-
-            [Display(Name = "Код категории услуги")]
-            public string CategoryCode { get; set; }
-
-            [Display(Name = "Название категории услуги")]
-            public string CategoryName { get; set; }
-
-            [Display(Name = "ID услуги")]
-            public Guid ServiceId { get; set; }
-
-            [Display(Name = "Код услуги")]
-            public string ServiceCode { get; set; }
-
-            [Display(Name = "Название услуги")]
-            public string ServiceName { get; set; }
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 
             public ServiceInfoDto(
                 Guid categoryId,
                 string categoryCode,
                 string categoryName,
+                string prefix,
                 Guid serviceId,
                 string serviceCode,
                 string serviceName)
@@ -129,6 +94,7 @@ namespace DirectoryService.Models.DTOs
                 CategoryId = categoryId;
                 CategoryCode = categoryCode;
                 CategoryName = categoryName;
+                CategoryPrefix = prefix;
                 ServiceId = serviceId;
                 ServiceCode = serviceCode;
                 ServiceName = serviceName;

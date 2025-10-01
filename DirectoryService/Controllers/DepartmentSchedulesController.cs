@@ -4,11 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace DirectoryService.Controllers
 {
     /// <summary>
-<<<<<<< HEAD
     /// Контроллер для получения расписаний подразделений
-=======
     /// Контроллер для управления расписаниями подразделений
->>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
     /// </summary>
     [Route("api/department/schedules")]
     [ApiController]
