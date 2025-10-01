@@ -1,6 +1,10 @@
 using DirectoryService.Data;
 using DirectoryService.Repositories;
 using DirectoryService.Services;
+<<<<<<< HEAD
+using DirectoryService.Services.DirectoryService.Services;
+=======
+>>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -14,6 +18,11 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+<<<<<<< HEAD
+builder.Services.AddScoped<IFacilityService, FacilityService>();
+builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
+=======
+>>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

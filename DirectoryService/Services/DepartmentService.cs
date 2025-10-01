@@ -1,4 +1,8 @@
 ﻿using DirectoryService.Models.DTOs;
+<<<<<<< HEAD
+using DirectoryService.Models.Entities;
+=======
+>>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
 using DirectoryService.Repositories;
 
 namespace DirectoryService.Services
@@ -6,10 +10,39 @@ namespace DirectoryService.Services
     public class DepartmentService : IDepartmentService
     {
         private readonly IDepartmentRepository _departmentRepository;
+<<<<<<< HEAD
+        private readonly IFacilityRepository _facilityRepository;
+
+        public DepartmentService(
+            IDepartmentRepository departmentRepository,
+            IFacilityRepository facilityRepository)
+        {
+            _departmentRepository = departmentRepository;
+            _facilityRepository = facilityRepository;
+        }
+
+        public async Task<FacilityDepartmentsResponseDto?> GetFacilityDepartmentsAsync(Guid facilityId)
+        {
+            if (!await _facilityRepository.FacilityExistsAsync(facilityId))
+                return null;
+
+            var departments = await _departmentRepository.GetFacilityDepartmentsAsync(facilityId);
+
+            return new FacilityDepartmentsResponseDto(
+                departments.Select(d => new FacilityDepartmentsResponseDto.DepartmentDto(
+                    id: d.Id,
+                    code: d.Code,
+                    name: d.Name,
+                    address: d.Address,
+                    allowScheduledAppointments: d.AllowScheduledAppointments
+                )).ToList()
+            );
+=======
 
         public DepartmentService(IDepartmentRepository departmentRepository)
         {
             _departmentRepository = departmentRepository;
+>>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
         }
 
         public async Task<DepartmentSchedulesResponseDto?> GetDepartmentSchedulesAsync(Guid departmentId)

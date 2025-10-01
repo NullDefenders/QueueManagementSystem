@@ -5,7 +5,10 @@ namespace DirectoryService.Models.DTOs
     /// <summary>
     /// DTO для ответа с информацией об услугах подразделения
     /// </summary>
+<<<<<<< HEAD
+=======
     /// 
+>>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
     public class DepartmentServicesResponseDto
     {
         /// <summary>

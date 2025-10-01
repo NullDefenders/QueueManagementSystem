@@ -4,7 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace DirectoryService.Controllers
 {
     /// <summary>
+<<<<<<< HEAD
+    /// Контроллер для управления услугами подразделений
+=======
     /// Контроллер для управления услугамии подразделений
+>>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
     /// </summary>
     [Route("api/department/services")]
     [ApiController]
@@ -18,11 +22,19 @@ namespace DirectoryService.Controllers
         }
 
         /// <summary>
+<<<<<<< HEAD
+        /// Получить услуги по идентификатору подразделения
+        /// </summary>
+        /// <param name="departmentId">Идентификатор подразделения</param>
+        /// <returns>Расписания подразделения</returns>
+        /// <response code="200">Возвращает услуги подразделения</response>
+=======
         /// Получить расписания по идентификатору подразделения
         /// </summary>
         /// <param name="departmentId">Идентификатор подразделения</param>
         /// <returns>Расписания подразделения</returns>
         /// <response code="200">Возвращает расписания подразделения</response>
+>>>>>>> d5e60c05f59b8083419873ace83c49b616cf056a
         /// <response code="400">Некорректный идентификатор подразделения</response>
         /// <response code="404">Подразделение с указанным ID не найдено</response>
         [HttpGet("{departmentId}")]
