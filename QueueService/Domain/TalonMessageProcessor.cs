@@ -29,33 +29,45 @@ public class TalonMessageProcessor : IMessageProcessor
       NullValueHandling = NullValueHandling.Ignore,
       MissingMemberHandling = MissingMemberHandling.Ignore
     };
+    var talons = new List<TalonDTO>();
 
-    var talon = JsonConvert.DeserializeObject<TalonDTO>(message, settings);
-
-    if (talon != null && !string.IsNullOrEmpty(talon.TalonNumber) && !string.IsNullOrEmpty(talon.ServiceCode))
+    if (message.TrimStart().StartsWith('['))
     {
-      var window = await _redisService._redisdb.ListLeftPopAsync ("WINDOWS");
-      if (window.IsNullOrEmpty) {
-        if (talon.PendingTime != null)
+      talons = JsonConvert.DeserializeObject<List<TalonDTO>>(message, settings);
+    }
+    else if (message.TrimStart().StartsWith('{'))
+    {
+      talons = [JsonConvert.DeserializeObject<TalonDTO>(message, settings)];
+    }
+
+    foreach (var talon in talons)
+    {
+      if (talon != null && !string.IsNullOrEmpty(talon.TalonNumber) && !string.IsNullOrEmpty(talon.ServiceCode))
+      {
+        var window = await _redisService._redisdb.ListRightPopAsync("WINDOWS");
+        if (window.IsNullOrEmpty)
         {
-          int MinutesAfterPending = _configuration.GetValue<int>("Settings:MinutesAfterPending");
-          double score = talon.PendingTime?.TotalSeconds ?? 0;
-          if (score >= (DateTime.Now.TimeOfDay.TotalSeconds - MinutesAfterPending * 60))
-            await _redisService._redisdb.SortedSetAddAsync("PENDING", talon.TalonNumber, score);
+          if (talon.PendingTime != null)
+          {
+            int MinutesAfterPending = _configuration.GetValue<int>("Settings:MinutesAfterPending");
+            double score = talon.PendingTime?.TotalSeconds ?? 0;
+            if (score >= (DateTime.Now.TimeOfDay.TotalSeconds - MinutesAfterPending * 60))
+              await _redisService._redisdb.SortedSetAddAsync("PENDING", talon.TalonNumber, score);
+          }
+          //        await _redisService._redisdb.ListLeftPushAsync($"TALONS:{talon.ServiceCode}", talon.TalonNumber);
+          await _redisService.AddIfNotExistsAsync("TALONS", talon.TalonNumber);
+
         }
-//        await _redisService._redisdb.ListLeftPushAsync($"TALONS:{talon.ServiceCode}", talon.TalonNumber);
-        await _redisService._redisdb.ListLeftPushAsync("TALONS", talon.TalonNumber);
+        else
+        {
+          var queue = new QueueDTO { TalonNumber = talon.TalonNumber, WindowNumber = window };
+          await _rabbitMQService.SendQueue(queue);
+        }
+
+        _logger.LogInformation($"Talon processed: {message}");
       }
       else
-      {
-        await _redisService._redisdb.SortedSetRemoveAsync("PENDING", talon.TalonNumber);
-        var queue = new QueueDTO { TalonNumber = talon.TalonNumber, WindowNumber = window};
-        await _rabbitMQService.SendQueue(queue);
-      }
-
-      _logger.LogInformation($"Talon processed: {message}");
+        _logger.LogError($"Talon message is not correct: {message}");
     }
-    else
-      _logger.LogError($"Talon message is not correct: {message}");
   }
 }
