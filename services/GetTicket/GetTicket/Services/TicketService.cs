@@ -35,9 +35,11 @@ namespace GetTicket.Services
             var newTicket = new Ticket
             {
                 Id = nextNumber,
-                TicketNumber = nextNumber.ToString(),
-                ServiceName = "",
+                TalonNumber = nextNumber.ToString(),
+                ServiceName = lastTicket != null ? lastTicket.ServiceName : "",
                 IssuedAt = DateTime.UtcNow,
+                ServiceCode = lastTicket != null ? lastTicket.ServiceCode : "",
+                PendingTime = DateTime.UtcNow,
             };
 
             await _tickets.InsertOneAsync(newTicket);

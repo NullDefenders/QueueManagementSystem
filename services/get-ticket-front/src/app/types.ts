@@ -24,5 +24,5 @@ export interface ITicket {
   id: number;
   issuedAt: Date;
   serviceName: string;
-  ticketNumber: string;
+  talonNumber: string;
 }

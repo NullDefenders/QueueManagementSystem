@@ -7,6 +7,7 @@ namespace GetTicket.Services
 {
     public interface ISimpleRabbitMQSender
     {
+        ValueTask DisposeAsync();
         Task SendTicketAsync(Ticket ticket);
     }
 
@@ -16,7 +17,7 @@ namespace GetTicket.Services
         private readonly IChannel _channel;
         private readonly ILogger<SimpleRabbitMQSender> _logger;
 
-        public SimpleRabbitMQSender(IConfiguration configuration, ILogger<SimpleRabbitMQSender> logger)
+        public SimpleRabbitMQSender(ILogger<SimpleRabbitMQSender> logger)
         {
             _logger = logger;
 
@@ -33,7 +34,7 @@ namespace GetTicket.Services
             _channel = Task.Run(async () => await _connection.CreateChannelAsync()).GetAwaiter().GetResult();
 
             _channel.QueueDeclareAsync(
-                queue: "talon-queue",
+                queue: "TalonQueue",
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
@@ -49,14 +50,11 @@ namespace GetTicket.Services
                 {
                     MessageId = Guid.NewGuid().ToString(),
                     TicketId = ticket.Id.ToString(),
-                    TicketNumber = ticket.TicketNumber,
+                    ticket.TalonNumber,
                     Action = "TicketCreated",
                     Timestamp = ticket.IssuedAt,
-                    Data = new
-                    {
-                        ServiceName = ticket.ServiceName,
-                        IssuedAt = ticket.IssuedAt
-                    }
+                    ticket.ServiceCode,
+                    ticket.PendingTime
                 };
 
                 var json = JsonSerializer.Serialize(message);
@@ -72,16 +70,16 @@ namespace GetTicket.Services
 
                 await _channel.BasicPublishAsync(
                     exchange: "",
-                    routingKey: "talon-queue",
+                    routingKey: "TalonQueue",
                     mandatory: false,
                     basicProperties: properties,
                     body: body);
 
-                _logger.LogInformation("✅ Ticket {TicketNumber} sent directly to RabbitMQ", ticket.TicketNumber);
+                _logger.LogInformation("✅ Ticket {TicketNumber} sent directly to RabbitMQ", ticket.TalonNumber);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error sending ticket {TicketNumber} to RabbitMQ", ticket.TicketNumber);
+                _logger.LogError(ex, "❌ Error sending ticket {TicketNumber} to RabbitMQ", ticket.TalonNumber);
             }
         }
 

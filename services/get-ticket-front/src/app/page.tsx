@@ -167,7 +167,7 @@ export default function Home() {
         {step === Steps.Ticket && ticket && (
           <Ticket
             serviceName={ticket.serviceName}
-            ticketNumber={ticket.ticketNumber}
+            talonNumber={ticket.talonNumber}
             issuedAt={ticket.issuedAt}
           />
         )}
