@@ -18,6 +18,7 @@ export interface IService {
   serviceCode: string;
   serviceId: string;
   serviceName: string;
+  categoryPrefix: string;
 }
 
 export interface ITicket {

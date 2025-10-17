@@ -128,7 +128,18 @@ export default function Home() {
   };
 
   const onServcieNameClick = (serviceName: string) => {
-    fetch("http://localhost:5120/api/Ticket/GetTicket")
+    fetch("http://localhost:5120/api/Ticket/GenerateTicket", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        serviceName,
+        serviceCode: services.find(
+          (service) => service.serviceName === serviceName
+        )?.categoryPrefix,
+      }),
+    })
       .then((response) => response.json())
       .then((data: ITicket) => {
         const ticket = { ...data, serviceName: serviceName };

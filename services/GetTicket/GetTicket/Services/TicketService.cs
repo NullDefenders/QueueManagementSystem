@@ -23,23 +23,34 @@ namespace GetTicket.Services
             _logger = logger;
         }
 
-        public async Task<Ticket> GenerateTicketAsync()
+        public async Task<Ticket> GenerateTicketAsync(TicketRequest request)
         {
-            var lastTicket = await _tickets.Find(_ => true)
-                .SortByDescending(t => t.Id)
-                .Limit(1)
-                .FirstOrDefaultAsync();
+            var today = DateTime.Today;
+            var todaysTickets = await _tickets.Find(ticket => ticket.IssuedAt >= today && ticket.IssuedAt < today.AddDays(1)).ToListAsync();
+            int lastTicketNumber = todaysTickets
+                .Where(ticket => ticket.TalonNumber.StartsWith(request.ServiceCode + "-"))
+                .Select(ticket =>
+                {
+                    var parts = ticket.TalonNumber.Split('-');
+                    if (parts.Length == 2 && int.TryParse(parts[1], out int number))
+                    {
+                        return number;
+                    }
+                    return 0;
+                })
+                .DefaultIfEmpty(0)
+                .Max();
 
-            int nextNumber = (lastTicket?.Id ?? 0) + 1;
+            int nextNumber = lastTicketNumber + 1;
+            string newTicketTalonNumber = $"{request.ServiceCode}-{nextNumber}";
 
             var newTicket = new Ticket
             {
-                Id = nextNumber,
-                TalonNumber = nextNumber.ToString(),
-                ServiceName = lastTicket != null ? lastTicket.ServiceName : "",
+                TalonNumber = newTicketTalonNumber,
+                ServiceName = request.ServiceName,
                 IssuedAt = DateTime.UtcNow,
-                ServiceCode = lastTicket != null ? lastTicket.ServiceCode : "",
-                PendingTime = DateTime.UtcNow,
+                ServiceCode = request.ServiceCode,
+                PendingTime = null,
             };
 
             await _tickets.InsertOneAsync(newTicket);

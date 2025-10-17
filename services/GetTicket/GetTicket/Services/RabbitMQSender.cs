@@ -49,12 +49,11 @@ namespace GetTicket.Services
                 var message = new
                 {
                     MessageId = Guid.NewGuid().ToString(),
-                    TicketId = ticket.Id.ToString(),
                     ticket.TalonNumber,
                     Action = "TicketCreated",
                     Timestamp = ticket.IssuedAt,
                     ticket.ServiceCode,
-                    ticket.PendingTime
+                    PendingTime = ticket.PendingTime ?? null
                 };
 
                 var json = JsonSerializer.Serialize(message);

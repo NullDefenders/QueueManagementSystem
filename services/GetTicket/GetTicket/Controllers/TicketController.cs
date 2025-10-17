@@ -1,3 +1,4 @@
+using GetTicket.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GetTicket.Controllers
@@ -8,12 +9,12 @@ namespace GetTicket.Controllers
     {
         private readonly GetTicket.Services.TicketService _ticketService = ticketService;
 
-        [HttpGet("GetTicket")]
-        public async Task<IActionResult> GetTicket()
+        [HttpPost("GenerateTicket")]
+        public async Task<IActionResult> GenerateTicket([FromBody] TicketRequest request)
         {
             try
             {
-                var ticket = await _ticketService.GenerateTicketAsync();
+                var ticket = await _ticketService.GenerateTicketAsync(request);
                 return Ok(ticket);
             }
             catch (Exception)
