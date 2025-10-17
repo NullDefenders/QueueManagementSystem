@@ -20,10 +20,20 @@
   font-weight: 600;
 }
 
+.stepCategories__inputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .stepCategories__input {
   width: 200px;
   height: 50px;
   margin: auto;
   padding: 0 10px;
   font-size: 30px;
+}
+
+.stepCategories__inputError {
+  color: var(--red);
 }

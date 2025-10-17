@@ -50,7 +50,7 @@ namespace GetTicket.Services
                 ServiceName = request.ServiceName,
                 IssuedAt = DateTime.UtcNow,
                 ServiceCode = request.ServiceCode,
-                PendingTime = null,
+                PendingTime = request.PendingTime,
             };
 
             await _tickets.InsertOneAsync(newTicket);

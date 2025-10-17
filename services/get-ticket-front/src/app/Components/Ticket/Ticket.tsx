@@ -4,6 +4,7 @@ interface TicketProps {
   serviceName: string;
   talonNumber: string;
   issuedAt: Date;
+  pendingTime: Date;
 }
 
 export const Ticket = (props: TicketProps) => {
@@ -16,6 +17,10 @@ export const Ticket = (props: TicketProps) => {
       <span className={styles.ticket__dateTitle}>Дата выдачи</span>
       <span className={styles.ticket__date}>
         {new Date(props.issuedAt).toLocaleString()}
+      </span>
+      <span className={styles.ticket__dateTitle}>Вы записаны на</span>
+      <span className={styles.ticket__date}>
+        {new Date(props.pendingTime).toLocaleString()}
       </span>
     </div>
   );

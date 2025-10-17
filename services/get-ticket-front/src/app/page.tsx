@@ -127,7 +127,7 @@ export default function Home() {
     setStep(Steps.Services);
   };
 
-  const onServcieNameClick = (serviceName: string) => {
+  const onServcieNameClick = (serviceName: string, pendingTime?: Date) => {
     fetch("http://localhost:5120/api/Ticket/GenerateTicket", {
       method: "POST",
       headers: {
@@ -138,6 +138,7 @@ export default function Home() {
         serviceCode: services.find(
           (service) => service.serviceName === serviceName
         )?.categoryPrefix,
+        pendingTime: pendingTime?.toISOString() ?? null,
       }),
     })
       .then((response) => response.json())
@@ -170,6 +171,7 @@ export default function Home() {
           <StepCategories
             categories={categories}
             onCategoryClick={onCategoryClick}
+            onServcieNameClick={onServcieNameClick}
           />
         )}
         {step === Steps.Services && (
@@ -180,6 +182,7 @@ export default function Home() {
             serviceName={ticket.serviceName}
             talonNumber={ticket.talonNumber}
             issuedAt={ticket.issuedAt}
+            pendingTime={ticket.pendingTime}
           />
         )}
       </main>
