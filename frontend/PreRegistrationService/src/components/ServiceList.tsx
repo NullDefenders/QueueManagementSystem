@@ -1,4 +1,4 @@
-import { Button, Heading, HStack, List, Spinner } from "@chakra-ui/react";
+import { Box, Button, Heading, SimpleGrid, Spinner, Text, VStack } from "@chakra-ui/react";
 import useServices, { type Service } from "../hooks/useServices";
 import { type ServiceQuery } from "../App";
 
@@ -29,28 +29,58 @@ const ServiceList = ({
       <Heading fontSize="2xl" marginTop={9} marginBottom={3}>
         Услуги
       </Heading>
-      <List.Root>
-        {data?.map((service) => (
-          <List.Item key={service.serviceId} paddingY="5px">
-            <HStack>
-              <Button
-                whiteSpace="normal"
-                textAlign="left"
-                fontWeight={
-                  service.serviceId === selectedService?.serviceId
-                    ? "bold"
-                    : "normal"
-                }
-                onClick={() => onSelectService(service)}
-                fontSize="md"
-                variant="solid"
-              >
-                {service.serviceName}
-              </Button>
-            </HStack>
-          </List.Item>
-        ))}
-      </List.Root>
+      <Box>
+        <SimpleGrid columns={{ base: 1, lg: 3, xl: 4 }} gap={3}>
+          {data?.map((service) => {
+            const isActive = service.serviceId === selectedService?.serviceId;
+            return (
+              <Box key={service.serviceId}>
+                <Button
+                  onClick={() => onSelectService(service)}
+                  justifyContent="flex-start"
+                  variant="ghost"
+                  w="full"
+                  px={4}
+                  py={4}
+                  borderRadius="md"
+                  bg={isActive ? "black" : "white"}
+                  color={isActive ? "white" : "black"}
+                  borderWidth="1px"
+                  borderColor={isActive ? "black" : "blackAlpha.300"}
+                  _hover={{ bg: isActive ? "blackAlpha.800" : "blackAlpha.50", borderColor: isActive ? "black" : "blackAlpha.400" }}
+                  _focusVisible={{ boxShadow: "0 0 0 2px var(--chakra-colors-blackAlpha-400)" }}
+                  h="166px"
+                  whiteSpace="normal"
+                  alignItems="stretch"
+                >
+                  <VStack align="start" gap={1} w="full">
+                    <Text
+                      fontWeight={isActive ? "bold" : "semibold"}
+                      lineClamp={3}
+                      wordBreak="break-word"
+                      lineHeight="1.25"
+                    >
+                      {service.serviceName}
+                    </Text>
+                    {service.categoryName && (
+                      <Text
+                        fontSize="sm"
+                        opacity={isActive ? 0.9 : 0.8}
+                        lineClamp={2}
+                        color={isActive ? "white" : "blackAlpha.800"}
+                        wordBreak="break-word"
+                        lineHeight="1.2"
+                      >
+                        {service.categoryName}
+                      </Text>
+                    )}
+                  </VStack>
+                </Button>
+              </Box>
+            );
+          })}
+        </SimpleGrid>
+      </Box>
     </>
   );
 };

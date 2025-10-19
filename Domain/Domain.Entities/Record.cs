@@ -25,8 +25,13 @@ namespace Domain.Entities
         [BsonElement("serviceId"), BsonRepresentation(MongoDB.Bson.BsonType.String)]
 
         public string? ServiceID { get; set; }
+        [BsonElement("categoryPrefix"), BsonRepresentation(MongoDB.Bson.BsonType.String)]
+        public string? CategoryPrefix { get; set; }
+        [BsonElement("serviceName"), BsonRepresentation(MongoDB.Bson.BsonType.String)]
+        public string? ServiceName { get; set; }
 
-        public Record(string id, string accountID, string name, string surname, DateTime recordTime, string recordCode, string serviceID)
+
+        public Record(string id, string accountID, string name, string surname, DateTime recordTime, string recordCode, string serviceID, string categoryPrefix, string serviceName)
         {
             Id = null;
             AccountID = accountID;
@@ -35,6 +40,8 @@ namespace Domain.Entities
             RecordTime = recordTime;
             RecordCode = recordCode;
             ServiceID = serviceID;
+            CategoryPrefix = categoryPrefix;
+            ServiceName = serviceName;
         }
     }
 }

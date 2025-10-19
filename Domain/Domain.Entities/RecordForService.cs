@@ -13,6 +13,8 @@ namespace Domain.Entities
         public DateTime recordTime { get; set; }
         public string name { get; set; }
         public string surname { get; set; }
+        public string categoryPrefix { get; set; }
+        public string serviceName { get; set; }
 
     }
 }
