@@ -19,7 +19,7 @@ export const StepCategories = (props: StepCategoriesProps) => {
         .then((response) => response.json())
         .then((data) => {
           console.log(new Date(data.recordTime));
-          props.onServcieNameClick("SLAVA", new Date(data.recordTime));
+          props.onServcieNameClick(data.serviceName, new Date(data.recordTime));
         })
         .catch(() => {
           setInputError("Нет такого кода бронирования");

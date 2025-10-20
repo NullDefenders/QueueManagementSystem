@@ -10,7 +10,7 @@ namespace GetTicket.Models
 
         public required DateTime IssuedAt { get; set; }
 
-        public DateTime? PendingTime { get; set; }
+        public string? PendingTime { get; set; }
 
         public required string ServiceName { get; set; } = "";
 

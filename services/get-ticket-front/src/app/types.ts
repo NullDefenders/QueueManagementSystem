@@ -26,5 +26,5 @@ export interface ITicket {
   issuedAt: Date;
   serviceName: string;
   talonNumber: string;
-  pendingTime: Date;
+  pendingTime: string;
 }

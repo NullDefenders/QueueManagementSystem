@@ -43,6 +43,9 @@ namespace GetTicket.Services
 
             int nextNumber = lastTicketNumber + 1;
             string newTicketTalonNumber = $"{request.ServiceCode}-{nextNumber}";
+            Console.WriteLine(request);
+            string? hourMinute = request.PendingTime?.ToString("HH:mm");
+            Console.WriteLine("aaa", hourMinute);
 
             var newTicket = new Ticket
             {
@@ -50,7 +53,7 @@ namespace GetTicket.Services
                 ServiceName = request.ServiceName,
                 IssuedAt = DateTime.UtcNow,
                 ServiceCode = request.ServiceCode,
-                PendingTime = request.PendingTime,
+                PendingTime = hourMinute,
             };
 
             await _tickets.InsertOneAsync(newTicket);
