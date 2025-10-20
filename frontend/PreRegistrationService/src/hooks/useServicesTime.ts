@@ -5,7 +5,7 @@ export interface ServiceTime {
   id: number;
   name: string;
   recording_time: { time: string }[];
-  engaged : number;
+  engaged: number;
 }
 
 const useGames = (serviceQuery: ServiceQuery) =>
@@ -13,9 +13,9 @@ const useGames = (serviceQuery: ServiceQuery) =>
     "/serviceTimes",
     {
       params: {
-        services: serviceQuery.service?.id,
+        services: serviceQuery.service,
         ordering: serviceQuery.sortOrder,
-        search: serviceQuery.searchText
+        search: serviceQuery.searchText,
       },
     },
     [serviceQuery]
