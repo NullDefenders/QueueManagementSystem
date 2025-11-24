@@ -132,7 +132,7 @@ export default function Home() {
     pendingTime?: Date,
     categoryPrefix?: string
   ) => {
-    fetch("http://localhost:5120/api/Ticket/GenerateTicket", {
+    fetch("http://localhost:8080/api/Ticket/GenerateTicket", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
