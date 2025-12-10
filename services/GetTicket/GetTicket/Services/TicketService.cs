@@ -43,9 +43,7 @@ namespace GetTicket.Services
 
             int nextNumber = lastTicketNumber + 1;
             string newTicketTalonNumber = $"{request.ServiceCode}-{nextNumber}";
-            Console.WriteLine(request);
-            string? hourMinute = request.PendingTime?.ToString("HH:mm");
-            Console.WriteLine("aaa", hourMinute);
+            string? hourMinute = request.PendingTime?.ToString("HH:mm") ?? null;
 
             var newTicket = new Ticket
             {
@@ -56,7 +54,9 @@ namespace GetTicket.Services
                 PendingTime = hourMinute,
             };
 
+            _logger.LogInformation("Попытка вставки талона: {TalonNumber}", newTicket.TalonNumber);
             await _tickets.InsertOneAsync(newTicket);
+            _logger.LogInformation("Талон успешно сохранен в MongoDB");
 
             await _rabbitMQSender.SendTicketAsync(newTicket);
 

@@ -52,6 +52,24 @@ services:
       - Redis__Host=redis
     restart: unless-stopped
 
+  getticket-service:
+    build:
+      context: ../services/GetTicket/GetTicket
+    container_name: getticket-service
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    restart: unless-stopped
+
+  # directory-service:
+  #   build:
+  #     context: ../DirectoryService
+  #   container_name: directory-service
+  #   ports:
+  #     - "8082:8082"
+  #     - "8083:8083"
+  #   restart: unless-stopped
+
 volumes:
   rabbitmq_data:
     driver: local
