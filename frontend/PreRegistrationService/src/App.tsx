@@ -106,9 +106,11 @@ function App() {
         <ServiceList
           serviceQuery={serviceQuery}
           selectedService={serviceQuery.service}
-          onSelectService={(service) =>
-            setServiceQuery({ ...serviceQuery, service })
-          }
+          onSelectService={(service) => {
+            // Устанавливаем дату по умолчанию (завтра), если она еще не установлена
+            const newDate = serviceQuery.date || toISODate(addDays(today, 1));
+            setServiceQuery({ ...serviceQuery, service, date: newDate });
+          }}
         />
       </GridItem>
       <GridItem area="main">
