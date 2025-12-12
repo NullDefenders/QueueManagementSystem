@@ -1,4 +1,4 @@
-import { SimpleGrid } from "@chakra-ui/react";
+import { SimpleGrid, Text, Box } from "@chakra-ui/react";
 import { type ServiceQuery } from "../App";
 import TimeCard from "./TimeCard";
 import TimeCardContainer from "./TimeCardContainer";
@@ -20,6 +20,7 @@ const TimeGrid = ({ serviceQuery, selectedTime, onSelectTime }: Props) => {
   // Логирование для отладки
   useEffect(() => {
     console.log("TimeGrid - занятые времена:", occupiedTimes);
+    console.log("TimeGrid - количество занятых времен:", occupiedTimes.length);
     console.log("TimeGrid - дата:", serviceQuery.date);
     console.log("TimeGrid - serviceId:", serviceQuery.service?.serviceId);
     if (error) {
@@ -35,21 +36,29 @@ const TimeGrid = ({ serviceQuery, selectedTime, onSelectTime }: Props) => {
   const formatTime = (time: number) => {
     const hours = Math.floor(time / 60);
     const minutes = time % 60;
-    return `${hours}:${minutes.toString().padStart(2, "0")}`;
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   };
 
   const isTimeOccupied = (time: string) => {
     const result = occupiedTimes.includes(time);
     if (result) {
-      console.log(`Время ${time} занято`);
+      console.log(`Время ${time} занято (найдено в массиве)`);
     }
     return result;
   };
 
   return (
     <>
-      {error && <div style={{ color: "red", padding: "10px" }}>Ошибка: {error}</div>}
-      {isLoading && <div style={{ padding: "10px" }}>Загрузка занятых времен...</div>}
+      {error && (
+        <Box color="red.500" padding="10px" bg="red.50" _dark={{ bg: "red.900", color: "red.200" }} borderRadius="md" mb={2}>
+          Ошибка: {error}
+        </Box>
+      )}
+      {isLoading && (
+        <Box padding="10px" color="fg.muted">
+          Загрузка занятых времен...
+        </Box>
+      )}
       <SimpleGrid
         columns={{ sm: 1, md: 2, lg: 3, xl: 4 }}
         padding="24px"

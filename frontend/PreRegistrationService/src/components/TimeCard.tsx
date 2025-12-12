@@ -8,13 +8,20 @@ interface Props {
 }
 
 const TimeCard = ({ time, isSelected, isOccupied, onClick }: Props) => {
+  // Приоритет: занятые времена важнее выбранных
+  const showOccupied = isOccupied;
+  const showSelected = isSelected && !isOccupied;
+
   return (
     <Card.Root
-      onClick={isOccupied ? undefined : onClick}
-      cursor={isOccupied ? "not-allowed" : "pointer"}
-      outline={isSelected ? "2px solid var(--chakra-colors-blue-500)" : "none"}
-      bg={isOccupied ? "red.100" : isSelected ? "blue.50" : undefined}
-      opacity={isOccupied ? 0.6 : 1}
+      onClick={showOccupied ? undefined : onClick}
+      cursor={showOccupied ? "not-allowed" : "pointer"}
+      outline={showSelected ? "2px solid var(--chakra-colors-blue-500)" : showOccupied ? "2px solid var(--chakra-colors-red-500)" : "none"}
+      bg={showOccupied ? "red.300" : showSelected ? "blue.50" : undefined}
+      _dark={{
+        bg: showOccupied ? "red.700" : showSelected ? "blue.900" : undefined,
+      }}
+      opacity={showOccupied ? 1 : 1}
     >
       <Card.Body>
         <HStack justifyContent="space-between" marginBottom={3}></HStack>
@@ -23,7 +30,10 @@ const TimeCard = ({ time, isSelected, isOccupied, onClick }: Props) => {
             fontSize="2xl" 
             letterSpacing="tight" 
             fontWeight="bold" 
-            color={isOccupied ? "red.600" : isSelected ? "black" : undefined}
+            color={showOccupied ? "red.800" : showSelected ? "fg" : "fg"}
+            _dark={{
+              color: showOccupied ? "red.100" : showSelected ? "fg" : "fg",
+            }}
           >
             {time}
           </Heading>

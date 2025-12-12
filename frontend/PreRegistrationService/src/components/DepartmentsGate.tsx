@@ -40,12 +40,22 @@ const DepartmentsGate = ({ facilityId, onContinue, onLoaded }: Props) => {
               p={3}
               onClick={() => setSelectedDepartmentId(d.id)}
               cursor="pointer"
-              bg={isActive ? "black" : "white"}
-              color={isActive ? "white" : "black"}
-              borderColor={isActive ? "black" : "blackAlpha.300"}
+              bg={isActive ? "colorPalette.600" : "bg"}
+              color={isActive ? "white" : "fg"}
+              borderColor={isActive ? "colorPalette.600" : "border"}
+              _hover={{
+                bg: isActive ? "colorPalette.700" : "bg.subtle",
+                borderColor: isActive ? "colorPalette.700" : "border.emphasized"
+              }}
+              _dark={{
+                bg: isActive ? "colorPalette.500" : "bg",
+                _hover: {
+                  bg: isActive ? "colorPalette.600" : "bg.subtle",
+                }
+              }}
             >
               <VStack align="start" gap={1}>
-                <Text fontWeight={isActive ? "bold" : "semibold"}>{d.name}</Text>
+                <Text fontWeight={isActive ? "bold" : "semibold"} color={isActive ? "white" : "fg"}>{d.name}</Text>
                 <Text fontSize="sm" color={isActive ? "whiteAlpha.800" : "fg.muted"}>ID: {d.id}</Text>
               </VStack>
             </Box>

@@ -19,7 +19,7 @@ const ServiceList = ({
 
   if (error) {
     console.error('ServiceList error:', error);
-    return <div>Ошибка загрузки: {error}</div>;
+    return <Text color="red.500">Ошибка загрузки: {error}</Text>;
   }
 
   if (isLoading) return <Spinner />;
@@ -43,12 +43,22 @@ const ServiceList = ({
                   px={4}
                   py={4}
                   borderRadius="md"
-                  bg={isActive ? "black" : "white"}
-                  color={isActive ? "white" : "black"}
+                  bg={isActive ? "colorPalette.600" : "bg"}
+                  color={isActive ? "white" : "fg"}
                   borderWidth="1px"
-                  borderColor={isActive ? "black" : "blackAlpha.300"}
-                  _hover={{ bg: isActive ? "blackAlpha.800" : "blackAlpha.50", borderColor: isActive ? "black" : "blackAlpha.400" }}
-                  _focusVisible={{ boxShadow: "0 0 0 2px var(--chakra-colors-blackAlpha-400)" }}
+                  borderColor={isActive ? "colorPalette.600" : "border"}
+                  _hover={{ 
+                    bg: isActive ? "colorPalette.700" : "bg.subtle", 
+                    borderColor: isActive ? "colorPalette.700" : "border.emphasized" 
+                  }}
+                  _dark={{
+                    bg: isActive ? "colorPalette.500" : "bg",
+                    color: isActive ? "white" : "fg",
+                    _hover: {
+                      bg: isActive ? "colorPalette.600" : "bg.subtle",
+                    }
+                  }}
+                  _focusVisible={{ boxShadow: "0 0 0 2px var(--chakra-colors-colorPalette-400)" }}
                   h="166px"
                   whiteSpace="normal"
                   alignItems="stretch"
@@ -59,6 +69,7 @@ const ServiceList = ({
                       lineClamp={3}
                       wordBreak="break-word"
                       lineHeight="1.25"
+                      color={isActive ? "white" : "fg"}
                     >
                       {service.serviceName}
                     </Text>
@@ -67,7 +78,7 @@ const ServiceList = ({
                         fontSize="sm"
                         opacity={isActive ? 0.9 : 0.8}
                         lineClamp={2}
-                        color={isActive ? "white" : "blackAlpha.800"}
+                        color={isActive ? "whiteAlpha.800" : "fg.muted"}
                         wordBreak="break-word"
                         lineHeight="1.2"
                       >
