@@ -30,13 +30,13 @@ public class RabbitMQBackgroundService : BackgroundService
         return Task.CompletedTask;
     }
 
-    private void OnMessageReceived(object? sender, QueueDTO message)
+    private void OnMessageReceived(object? sender, BaseDTO message)
     {
         try
         {
             var jsonMessage = JsonSerializer.Serialize(message, new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                Converters = { new DTOJsonConverter() }
             });
             
             _sseService.SendToAll(jsonMessage);

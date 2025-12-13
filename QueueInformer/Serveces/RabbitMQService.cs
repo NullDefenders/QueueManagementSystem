@@ -4,6 +4,7 @@ using RabbitMQ.Client.Events;
 using RabbitMqSse.Models;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Channels;
 
 
@@ -17,10 +18,10 @@ public class RabbitMQService : IAsyncDisposable
 
     private IConnection _connection;
     private IChannel _channel;
-    private readonly string _queueName;
+    private readonly string[] _queueNames;
     private AsyncEventingBasicConsumer? _consumer;
 
-    public event EventHandler<QueueDTO>? MessageReceived;
+    public event EventHandler<BaseDTO>? MessageReceived;
 
     public RabbitMQService(ILogger<RabbitMQService> logger, IConfiguration configuration)
     {
@@ -36,7 +37,7 @@ public class RabbitMQService : IAsyncDisposable
           Password = rabbitConfig["Password"] ?? "guest",
           VirtualHost = rabbitConfig["VirtualHost"] ?? "/"
         };
-        _queueName = configuration["Queues:Queue"] ?? "Queue";
+        _queueNames = new[] { configuration["Queues:WindowsQueue"] ?? "WindowsQueue", configuration["Queues:TalonQueue"] ?? "TalonQueue", configuration["Queues:Queue"] ?? "Queue" };
   }
 
   public async Task StartConsumingAsync(CancellationToken cancellationToken = default)
@@ -44,16 +45,18 @@ public class RabbitMQService : IAsyncDisposable
     _connection = await _connectionFactory.CreateConnectionAsync();
     _channel = await _connection.CreateChannelAsync();
 
-
-    // Объявляем очередь (если не существует)
-    await _channel.QueueDeclareAsync(
-            queue: _queueName,
-            durable: true,
-            exclusive: false,
-            autoDelete: false,
-            arguments: null,
-            cancellationToken: cancellationToken
+        // Объявляем все очереди
+        foreach (var queueName in _queueNames)
+        {
+            await _channel.QueueDeclareAsync(
+                queue: queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null,
+                cancellationToken: cancellationToken
             );
+        }
 
     var consumer = new AsyncEventingBasicConsumer(_channel);
 
@@ -64,7 +67,24 @@ public class RabbitMQService : IAsyncDisposable
             {
                 var body = ea.Body.ToArray();
                 var messageJson = Encoding.UTF8.GetString(body);
-                var message = JsonSerializer.Deserialize<QueueDTO>(messageJson);
+                var message = JsonSerializer.Deserialize<BaseDTO>(messageJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new DTOJsonConverter(), new JsonStringEnumConverter() }
+                });
+
+                switch (message)
+                {
+                    case TalonDTO talon:
+                        // работаем с талоном
+                        break;
+                    case WindowDTO window:
+                        // работаем с окном
+                        break;
+                    case QueueDTO queue:
+                        // работаем с очередью
+                        break;
+                }
 
                 if (message != null)
                 {
@@ -81,10 +101,17 @@ public class RabbitMQService : IAsyncDisposable
             }
         };
 
-        await _channel.BasicConsumeAsync(
-            queue: _queueName,
-            autoAck: false,
-            consumer: consumer);
+        foreach (var queueName in _queueNames)
+        {
+            await _channel.BasicConsumeAsync(
+                queue: queueName,
+                autoAck: false, // важно: ручное подтверждение
+                consumer: consumer,
+                cancellationToken: cancellationToken
+            );
+
+            Console.WriteLine($"Subscribed to queue: {queueName}");
+        }
     }
 
     public async ValueTask DisposeAsync()
