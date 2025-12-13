@@ -106,9 +106,11 @@ function App() {
         <ServiceList
           serviceQuery={serviceQuery}
           selectedService={serviceQuery.service}
-          onSelectService={(service) =>
-            setServiceQuery({ ...serviceQuery, service })
-          }
+          onSelectService={(service) => {
+            // Устанавливаем дату по умолчанию (завтра), если она еще не установлена
+            const newDate = serviceQuery.date || toISODate(addDays(today, 1));
+            setServiceQuery({ ...serviceQuery, service, date: newDate });
+          }}
         />
       </GridItem>
       <GridItem area="main">
@@ -116,7 +118,7 @@ function App() {
           <VStack align="stretch" gap={3}>
             <HStack justify="space-between" gap={4} wrap="wrap">
               <Heading size="lg">Выбор даты и времени</Heading>
-              <Text fontWeight="medium">{formatDayLabel(new Date(selectedDateISO))}</Text>
+              <Text fontWeight="medium" color="black">{formatDayLabel(new Date(selectedDateISO))}</Text>
             </HStack>
             <HStack gap={3} align="center">
               <IconButton
@@ -143,7 +145,7 @@ function App() {
                 </Slider.Root>
                 <HStack justify="space-between" mt={1}>
                   {Array.from({ length: daysToShow }, (_, i) => (
-                    <Text key={i} fontSize="xs" color={i === selectedIndex ? "fg" : "fg.muted"}>
+                    <Text key={i} fontSize="xs" color={i === selectedIndex ? "black" : "fg.muted"}>
                       {formatDayLabel(addDays(new Date(toISODate(addDays(today, 1))), i))}
                     </Text>
                   ))}
@@ -189,15 +191,15 @@ function App() {
         >
           <Dialog.Backdrop />
           <Dialog.Positioner>
-          <Dialog.Content maxW="md" w="90vw" borderRadius="lg" boxShadow="lg" color="white">
+          <Dialog.Content maxW="md" w="90vw" borderRadius="lg" boxShadow="lg">
             <Dialog.Header>
-              <Heading size="md">Данные для записи</Heading>
+              <Heading size="md" color="fg" _dark={{ color: "white" }}>Данные для записи</Heading>
             </Dialog.Header>
             <Dialog.Body>
               {recordCode ? (
                 <VStack align="stretch" gap={3}>
-                  <Heading size="md">Запись создана</Heading>
-                  <Text>Ваш код записи:</Text>
+                  <Heading size="md" color="fg" _dark={{ color: "white" }}>Запись создана</Heading>
+                  <Text color="fg" _dark={{ color: "white" }}>Ваш код записи:</Text>
                   <Box
                     borderWidth="1px"
                     borderRadius="md"
@@ -205,11 +207,13 @@ function App() {
                     fontSize="xl"
                     fontWeight="bold"
                     textAlign="center"
-                    color="white"
+                    bg="bg.subtle"
+                    color="fg"
+                    _dark={{ color: "white" }}
                   >
                     {recordCode}
                   </Box>
-                  <Box color="whiteAlpha.800" fontSize="sm">
+                  <Box color="fg.muted" fontSize="sm" _dark={{ color: "whiteAlpha.800" }}>
                     <Text>Дата: {selectedDateISO}</Text>
                     <Text>Время: {serviceQuery.time}</Text>
                   </Box>
@@ -217,29 +221,29 @@ function App() {
               ) : (
                 <VStack align="stretch" gap={4}>
                   <Box>
-                    <Text mb={1}>Фамилия</Text>
+                    <Text mb={1} color="fg" _dark={{ color: "white" }}>Фамилия</Text>
                     <Input
                       value={lastName}
+                      color="fg"
+                      _dark={{ color: "white" }}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Введите фамилию"
                       size="md"
                       autoFocus
-                      color="white"
-                      _placeholder={{ color: "whiteAlpha.700" }}
                     />
                   </Box>
                   <Box>
-                    <Text mb={1}>Имя</Text>
+                    <Text mb={1} color="fg" _dark={{ color: "white" }}>Имя</Text>
                     <Input
                       value={firstName}
+                      color="fg"
+                      _dark={{ color: "white" }}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="Введите имя"
                       size="md"
-                      color="white"
-                      _placeholder={{ color: "whiteAlpha.700" }}
                     />
                   </Box>
-                  <Box color="whiteAlpha.800" fontSize="sm">
+                  <Box color="fg.muted" fontSize="sm" _dark={{ color: "whiteAlpha.800" }}>
                     <Text>Дата: {selectedDateISO}</Text>
                     <Text>Время: {serviceQuery.time}</Text>
                   </Box>

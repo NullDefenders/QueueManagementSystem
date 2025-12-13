@@ -55,5 +55,19 @@ namespace PreRegistrationService.Repositories
             var record = await _records.FindAsync(filter);
             return record.ToList<Record>()[0];
         }
+
+        public async Task<List<string>> GetAllRecordingTimesInDay(string serviceID, string data)
+        {
+            DateOnly date;
+            DateOnly.TryParse(data, out date);
+            var filter = Builders<Record>.Filter.Where(x => (x.RecordTime.Year == date.Year && x.RecordTime.Month == date.Month && x.RecordTime.Day == date.Day && x.ServiceID == serviceID));
+            var recordTimesInDay = await _records.Find(filter).ToListAsync();
+            List<string> times = new List<string>();
+            foreach(var record in recordTimesInDay)
+            {
+                times.Add(new TimeOnly(record.RecordTime.Hour, record.RecordTime.Minute).ToString("HH:mm"));
+            }
+            return times;
+        }
     }
 }
