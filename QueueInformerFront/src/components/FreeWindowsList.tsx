@@ -6,7 +6,7 @@ interface FreeWindowsListProps {
 
 const FreeWindowsList: React.FC<FreeWindowsListProps> = ({ windows }) => {
     return (
-        <div style={{ padding: 0, minHeight: 400}}>
+        <div style={{ padding: 0}}>
             {windows.length > 0 ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
                     {windows.map(num => (

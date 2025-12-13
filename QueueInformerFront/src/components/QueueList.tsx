@@ -7,7 +7,7 @@ interface QueueListProps {
 
 const QueueList: React.FC<QueueListProps> = ({ queue }) => {
     return (
-        <ul style={{ listStyle: 'none', padding: 0, minHeight: 400 }}>
+        <ul style={{ listStyle: 'none', padding: 0, height: '45%' }}>
             {queue.map(talon => (
                 <li 
                     key={talon.TalonNumber}
