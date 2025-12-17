@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Сервис управления окном</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><i class="fas fa-window-maximize"></i> Управление окном</h1>
+        <p class="subtitle">Сервис отправки статуса окна в RabbitMQ</p>
+      </div>
+
+      <div class="window-info">
+        <div class="form-group">
+          <label for="windowNumber"
+            ><i class="fas fa-hashtag"></i> Номер окна:</label
+          >
+          <div class="input-with-icon">
+            <i class="fas fa-window-restore input-icon"></i>
+            <input
+              type="text"
+              id="windowNumber"
+              value="Окно 1"
+              placeholder="Введите номер окна"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-info-circle"></i> Текущий статус:</label>
+          <div class="status-display" id="currentStatus">
+            <span class="status-badge free"
+              ><i class="fas fa-check-circle"></i> Свободно</span
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-exchange-alt"></i> Выберите действие:</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="status" value="free" checked />
+              <span class="radio-custom free"
+                ><i class="fas fa-check"></i
+              ></span>
+              <span>Свободно</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="status" value="busy" />
+              <span class="radio-custom busy"
+                ><i class="fas fa-user-clock"></i
+              ></span>
+              <span>Занято</span>
+            </label>
+          </div>
+        </div>
+
+        <button id="sendButton" class="btn-send">
+          <i class="fas fa-paper-plane"></i> Отправить статус в RabbitMQ
+        </button>
+
+        <div class="result-section">
+          <h3><i class="fas fa-history"></i> Результаты отправки:</h3>
+          <div class="result-container">
+            <div id="lastResult" class="result-message">
+              <i class="fas fa-info-circle"></i> Нажмите кнопку для отправки
+              статуса
+            </div>
+          </div>
+          <div class="history">
+            <h4><i class="fas fa-list"></i> История отправок:</h4>
+            <div id="historyList" class="history-list">
+              <!-- История будет добавляться здесь -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <h3><i class="fas fa-info-circle"></i> Информация о системе:</h3>
+        <div class="info-item">
+          <i class="fas fa-server"></i>
+          <span
+            >RabbitMQ:
+            <span id="rabbitStatus" class="status-connected"
+              >Подключено</span
+            ></span
+          >
+        </div>
+        <div class="info-item">
+          <i class="fas fa-code"></i>
+          <span>Формат данных: JSON</span>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-exchange-alt"></i>
+          <span>Очередь: WindowStatusQueue</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,5 +1,4 @@
-﻿version: "3.9"
-services:
+﻿services:
   rabbitmq:
     image: rabbitmq:3.13.7-management
     container_name: rabbitmq
@@ -52,23 +51,34 @@ services:
       - Redis__Host=redis
     restart: unless-stopped
 
+  directory-service:
+    build:
+      context: ../DirectoryService
+    container_name: directory-service
+    ports:
+      - "8082:8082"
+     # - "8083:8083"
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:8082;
+    restart: unless-stopped
+
   getticket-service:
     build:
       context: ../services/GetTicket/GetTicket
     container_name: getticket-service
+    depends_on:
+        rabbitmq:
+          condition: service_healthy
+    environment:
+        - RabbitMQ__HostName=rabbitmq
+        - RabbitMQ__UserName=admin
+        - RabbitMQ__Password=password
+        - RabbitMQ__Port=5672
+        - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "8080:8080"
       - "8081:8081"
     restart: unless-stopped
-
-  # directory-service:
-  #   build:
-  #     context: ../DirectoryService
-  #   container_name: directory-service
-  #   ports:
-  #     - "8082:8082"
-  #     - "8083:8083"
-  #   restart: unless-stopped
 
 volumes:
   rabbitmq_data:

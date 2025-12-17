@@ -97,7 +97,7 @@ export default function Home() {
   const [ticket, setTicket] = useState<ITicket>();
 
   const onDepartmentClick = (id: string) => {
-    fetch(`http://localhost:5259/api/department/services/${id}`)
+    fetch(`http://localhost:8082/api/departments/${id}/services`)
       .then((response) => response.json())
       .then((data) => {
         setServices(data.services);
