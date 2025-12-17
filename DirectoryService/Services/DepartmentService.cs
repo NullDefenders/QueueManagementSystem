@@ -81,7 +81,7 @@ namespace DirectoryService.Services
                     w.Name,
                     w.ServiceCategories
                         .SelectMany(c => c.Services)
-                        .Select(s => new DepartmentWorkplacesResponseDto.ServiceInfoDto(
+                        .Select(s => new DepartmentWorkplacesResponseDto.WorkplaceServiceInfoDto(
                             s.ServiceCategory.Id,
                             s.ServiceCategory.Code,
                             s.ServiceCategory.Name,
@@ -102,7 +102,7 @@ namespace DirectoryService.Services
             var services = await _departmentRepository.GetDepartmentServicesAsync(departmentId);
 
             return new DepartmentServicesResponseDto(
-                services.Select(service => new DepartmentServicesResponseDto.ServiceInfoDto(
+                services.Select(service => new DepartmentServicesResponseDto.DepartmentServiceInfoDto(
                     categoryId: service.ServiceCategory.Id,
                     categoryCode: service.ServiceCategory.Code,
                     categoryName: service.ServiceCategory.Name,

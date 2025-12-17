@@ -11,6 +11,8 @@ namespace DirectoryService.Data
         public DbSet<ServiceCategory> ServiceCategories { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<Queue> Queues { get; set; }
+        public DbSet<QueueSettings> QueueSettings { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options) { }
@@ -45,7 +47,14 @@ namespace DirectoryService.Data
                 .Property(np => np.Id)
                 .HasDefaultValueSql("gen_random_uuid()");
 
-            // настройка связи один-ко-многим
+            modelBuilder.Entity<Queue>()
+                .Property(u => u.Id)
+                .HasDefaultValueSql("gen_random_uuid()");
+
+            modelBuilder.Entity<QueueSettings>()
+                .Property(s => s.Id)
+                .HasDefaultValueSql("gen_random_uuid()");
+
             modelBuilder.Entity<Department>()
                 .HasOne(d => d.Facility)          
                 .WithMany(f => f.Departments)   
@@ -82,6 +91,11 @@ namespace DirectoryService.Data
                     j => j.HasOne<Department>().WithMany().HasForeignKey("DepartmentId"),
                     j => j.HasOne<ServiceCategory>().WithMany().HasForeignKey("ServiceCategoryId"),
                     j => j.HasKey("ServiceCategoryId", "DepartmentId"));
+
+            modelBuilder.Entity<Queue>()
+                .HasOne(q => q.QueueSettings)
+                .WithOne(s => s.Queue)
+                .HasForeignKey<QueueSettings>(s => s.QueueId);
 
             modelBuilder.Entity<Service>()
                 .HasOne(s => s.ServiceCategory)
@@ -125,13 +139,24 @@ namespace DirectoryService.Data
                 .HasDefaultValueSql("now()")
                 .ValueGeneratedOnAdd();
 
+            modelBuilder.Entity<Queue>()
+                .Property(q => q.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<QueueSettings>()
+                .Property(q => q.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .ValueGeneratedOnAdd();
+
             modelBuilder.Entity<Facility>().HasQueryFilter(f => f.DeletedAt == null);
             modelBuilder.Entity<Department>().HasQueryFilter(d => d.DeletedAt == null);
             modelBuilder.Entity<Workplace>().HasQueryFilter(w => w.DeletedAt == null);
             modelBuilder.Entity<ServiceCategory>().HasQueryFilter(c => c.DeletedAt == null);
             modelBuilder.Entity<Service>().HasQueryFilter(s => s.DeletedAt == null);
             modelBuilder.Entity<Schedule>().HasQueryFilter(s => s.DeletedAt == null);
-
+            modelBuilder.Entity<Queue>().HasQueryFilter(s => s.DeletedAt == null);
+            modelBuilder.Entity<QueueSettings>().HasQueryFilter(s => s.DeletedAt == null);
         }
     }
 }

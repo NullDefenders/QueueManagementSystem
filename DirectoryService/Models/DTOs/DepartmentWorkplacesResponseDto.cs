@@ -8,15 +8,23 @@ namespace DirectoryService.Models.DTOs
     public class DepartmentWorkplacesResponseDto
     {
         /// <summary>
-        /// Список рабочих мест подразделения
+        /// Конструктор по умолчанию (для Swagger)
         /// </summary>
-        [Display(Name = "Список окон подразделения")]
-        public List<WorkplaceDto> Workplaces { get; }
+        public DepartmentWorkplacesResponseDto() { }
 
+        /// <summary>
+        /// Конструктор с параметрами (для сервисного слоя)
+        /// </summary>
         public DepartmentWorkplacesResponseDto(List<WorkplaceDto> workplaces)
         {
             Workplaces = workplaces;
         }
+
+        /// <summary>
+        /// Список рабочих мест подразделения
+        /// </summary>
+        [Display(Name = "Список окон подразделения")]
+        public List<WorkplaceDto> Workplaces { get; set; } = new List<WorkplaceDto>();
 
         /// <summary>
         /// DTO с информацией об окне
@@ -24,65 +32,54 @@ namespace DirectoryService.Models.DTOs
         public class WorkplaceDto
         {
             /// <summary>
-            /// Уникальный идентификатор окна
+            /// Конструктор по умолчанию (для Swagger)
             /// </summary>
-            [Display(Name = "Уникальный идентификатор окна")]
-            public Guid Id { get; }
+            public WorkplaceDto() { }
 
-            /// <summary>
-            /// Уникальный код окна
-            /// </summary>
-            [Display(Name = "Уникальный код окна")]
-            public string Code { get; }
-
-            /// <summary>
-            /// Название окна
-            /// </summary>
-            [Display(Name = "Название окна")]
-            public string Name { get; }
-
-            /// <summary>
-            /// Список услуг, оказываемых окном
-            /// </summary>
-            [Display(Name = "Услуги, оказываемые окном")]
-            public List<ServiceInfoDto> Services { get; }
-
-            public WorkplaceDto(Guid id, string code, string name, List<ServiceInfoDto> services)
+            public WorkplaceDto(Guid id, string code, string name, List<WorkplaceServiceInfoDto> services)
             {
                 Id = id;
                 Code = code;
                 Name = name;
                 Services = services;
             }
+
+            /// <summary>
+            /// Уникальный идентификатор окна
+            /// </summary>
+            [Display(Name = "Уникальный идентификатор окна")]
+            public Guid Id { get; set; }
+
+            /// <summary>
+            /// Уникальный код окна
+            /// </summary>
+            [Display(Name = "Уникальный код окна")]
+            public string Code { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Название окна
+            /// </summary>
+            [Display(Name = "Название окна")]
+            public string Name { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Список услуг, оказываемых окном
+            /// </summary>
+            [Display(Name = "Услуги, оказываемые окном")]
+            public List<WorkplaceServiceInfoDto> Services { get; set; } = new List<WorkplaceServiceInfoDto>();
         }
 
         /// <summary>
         /// DTO с информацией об услугах
         /// </summary>
-        public class ServiceInfoDto
+        public class WorkplaceServiceInfoDto
         {
-            [Display(Name = "ID категории услуги")]
-            public Guid CategoryId { get; }
+            /// <summary>
+            /// Конструктор по умолчанию (для Swagger)
+            /// </summary>
+            public WorkplaceServiceInfoDto() { }
 
-            [Display(Name = "Код категории услуги")]
-            public string CategoryCode { get; }
-
-            [Display(Name = "Название категории услуги")]
-            public string CategoryName { get; }
-
-            [Display(Name = "Префис категории услуги")]
-            public string CategoryPrefix { get; }
-
-            [Display(Name = "ID услуги")]
-            public Guid ServiceId { get; }
-
-            [Display(Name = "Код услуги")]
-            public string ServiceCode { get; }
-
-            [Display(Name = "Название услуги")]
-            public string ServiceName { get; }
-
-            public ServiceInfoDto(
+            public WorkplaceServiceInfoDto(
                 Guid categoryId,
                 string categoryCode,
                 string categoryName,
@@ -99,6 +96,27 @@ namespace DirectoryService.Models.DTOs
                 ServiceCode = serviceCode;
                 ServiceName = serviceName;
             }
+
+            [Display(Name = "ID категории услуги")]
+            public Guid CategoryId { get; set; }
+
+            [Display(Name = "Код категории услуги")]
+            public string CategoryCode { get; set; } = string.Empty;
+
+            [Display(Name = "Название категории услуги")]
+            public string CategoryName { get; set; } = string.Empty;
+
+            [Display(Name = "Префис категории услуги")]
+            public string CategoryPrefix { get; set; } = string.Empty;
+
+            [Display(Name = "ID услуги")]
+            public Guid ServiceId { get; set; }
+
+            [Display(Name = "Код услуги")]
+            public string ServiceCode { get; set; } = string.Empty;
+
+            [Display(Name = "Название услуги")]
+            public string ServiceName { get; set; } = string.Empty;
         }
     }
 }

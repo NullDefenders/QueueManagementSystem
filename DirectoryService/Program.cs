@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -28,6 +27,8 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IFacilityService, FacilityService>();
 builder.Services.AddScoped<IFacilityRepository, FacilityRepository>();
+builder.Services.AddScoped<IQueueSettingsRepository, QueueSettingsRepository>();
+builder.Services.AddScoped<IQueueSettingsService, QueueSettingsService>();
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -38,11 +39,10 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "DirectoryService API",
         Version = "v1",
-        Description = "API для управления справочниками",
-        Contact = new OpenApiContact { Name = "Dev Team", Email = "dev@example.com" }
+        Description = "API для управления справочниками системы электронной очереди",
+        Contact = new OpenApiContact { Name = "Null Defenders", Email = "nulldefenders@gmail.com" }
     });
 
-    // Включение XML-документации (если есть комментарии)
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
@@ -54,7 +54,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// 6. Конфигурация middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -65,10 +64,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
