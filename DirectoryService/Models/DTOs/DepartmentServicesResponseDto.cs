@@ -8,43 +8,35 @@ namespace DirectoryService.Models.DTOs
     public class DepartmentServicesResponseDto
     {
         /// <summary>
-        /// Список оказываемых услуг
+        /// Конструктор по умолчанию (для Swagger)
         /// </summary>
-        [Display(Name = "Услуги")]
-        public List<ServiceInfoDto> Services { get; }
+        public DepartmentServicesResponseDto() { }
 
-        public DepartmentServicesResponseDto(List<ServiceInfoDto> services)
+        /// <summary>
+        /// Конструктор с параметрами (для сервисного слоя)
+        /// </summary>
+        public DepartmentServicesResponseDto(List<DepartmentServiceInfoDto> services)
         {
             Services = services;
         }
 
         /// <summary>
+        /// Список оказываемых услуг
+        /// </summary>
+        [Display(Name = "Услуги")]
+        public List<DepartmentServiceInfoDto> Services { get; set; } = new List<DepartmentServiceInfoDto>();
+
+        /// <summary>
         /// DTO с информацией об услугах подразделения
         /// </summary>
-        public class ServiceInfoDto
+        public class DepartmentServiceInfoDto
         {
-            [Display(Name = "ID категории услуги")]
-            public Guid CategoryId { get; }
+            /// <summary>
+            /// Конструктор по умолчанию (для Swagger)
+            /// </summary>
+            public DepartmentServiceInfoDto() { }
 
-            [Display(Name = "Код категории услуги")]
-            public string CategoryCode { get; }
-
-            [Display(Name = "Название категории услуги")]
-            public string CategoryName { get; }
-
-            [Display(Name = "Префикс категории услуги")]
-            public string CategoryPrefix { get; }
-
-            [Display(Name = "ID услуги")]
-            public Guid ServiceId { get; }
-
-            [Display(Name = "Код услуги")]
-            public string ServiceCode { get; }
-
-            [Display(Name = "Название услуги")]
-            public string ServiceName { get; }
-
-            public ServiceInfoDto(
+            public DepartmentServiceInfoDto(
                 Guid categoryId,
                 string categoryCode,
                 string categoryName,
@@ -61,6 +53,27 @@ namespace DirectoryService.Models.DTOs
                 ServiceCode = serviceCode;
                 ServiceName = serviceName;
             }
+
+            [Display(Name = "ID категории услуги")]
+            public Guid CategoryId { get; set; }
+
+            [Display(Name = "Код категории услуги")]
+            public string CategoryCode { get; set; } = string.Empty;
+
+            [Display(Name = "Название категории услуги")]
+            public string CategoryName { get; set; } = string.Empty;
+
+            [Display(Name = "Префикс категории услуги")]
+            public string CategoryPrefix { get; set; } = string.Empty;
+
+            [Display(Name = "ID услуги")]
+            public Guid ServiceId { get; set; }
+
+            [Display(Name = "Код услуги")]
+            public string ServiceCode { get; set; } = string.Empty;
+
+            [Display(Name = "Название услуги")]
+            public string ServiceName { get; set; } = string.Empty;
         }
     }
 }

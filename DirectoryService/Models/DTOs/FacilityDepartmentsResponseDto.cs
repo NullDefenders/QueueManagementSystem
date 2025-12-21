@@ -8,32 +8,30 @@ namespace DirectoryService.Models.DTOs
     public class FacilityDepartmentsResponseDto
     {
         /// <summary>
-        /// Список активных подразделений учреждения
+        /// Конструктор по умолчанию (для Swagger)
         /// </summary>
-        [Display(Name = "Список активных учреждений")]
-        public List<DepartmentDto> Departments { get; }
+        public FacilityDepartmentsResponseDto() { }
 
+        /// <summary>
+        /// Конструктор с параметрами (для сервисного слоя)
+        /// </summary>
         public FacilityDepartmentsResponseDto(List<DepartmentDto> departments)
         {
             Departments = departments;
         }
 
+        /// <summary>
+        /// Список активных подразделений учреждения
+        /// </summary>
+        [Display(Name = "Список активных учреждений")]
+        public List<DepartmentDto> Departments { get; set; } = new List<DepartmentDto>();
+
         public class DepartmentDto
         {
-            [Display(Name = "ID подразделения")]
-            public Guid Id { get; }
-
-            [Display(Name = "Код подразделения")]
-            public string Code { get; }
-
-            [Display(Name = "Название подразделения")]
-            public string Name { get; }
-
-            [Display(Name = "Адрес подразделения")]
-            public string Address { get; }
-
-            [Display(Name = "Разрешена ли предварительная запись")]
-            public bool AllowScheduledAppointments { get; }
+            /// <summary>
+            /// Конструктор по умолчанию (для Swagger)
+            /// </summary>
+            public DepartmentDto() { }
 
             public DepartmentDto(
                 Guid id,
@@ -48,6 +46,21 @@ namespace DirectoryService.Models.DTOs
                 Address = address;
                 AllowScheduledAppointments = allowScheduledAppointments;
             }
+
+            [Display(Name = "ID подразделения")]
+            public Guid Id { get; set; }
+
+            [Display(Name = "Код подразделения")]
+            public string Code { get; set; } = string.Empty;
+
+            [Display(Name = "Название подразделения")]
+            public string Name { get; set; } = string.Empty;
+
+            [Display(Name = "Адрес подразделения")]
+            public string Address { get; set; } = string.Empty;
+
+            [Display(Name = "Разрешена ли предварительная запись")]
+            public bool AllowScheduledAppointments { get; set; }
         }
     }
 }

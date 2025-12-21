@@ -1,29 +1,28 @@
-﻿using GetTicket.Models;
+﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Mvc;
 using RabbitMQ.Client;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 
-namespace GetTicket.Services
+namespace WindowService.Controllers
 {
-    public interface ISimpleRabbitMQSender
-    {
-        ValueTask DisposeAsync();
-        Task SendTicketAsync(Ticket ticket);
-    }
-
-    public class SimpleRabbitMQSender : ISimpleRabbitMQSender, IAsyncDisposable
+    [ApiController]
+    [Route("api/[controller]")]
+    public class WindowController : ControllerBase
     {
         private readonly IConnection _connection;
         private readonly IChannel _channel;
-        private readonly ILogger<SimpleRabbitMQSender> _logger;
+        private readonly ILogger<WindowController> _logger;
 
-        public SimpleRabbitMQSender(ILogger<SimpleRabbitMQSender> logger)
+        public WindowController(ILogger<WindowController> logger)
         {
             _logger = logger;
 
             var factory = new ConnectionFactory()
             {
-                HostName = "rabbitmq",
+                HostName = "localhost",
                 Port = 5672,
                 UserName = "admin",
                 Password = "password",
@@ -34,7 +33,7 @@ namespace GetTicket.Services
             _channel = Task.Run(async () => await _connection.CreateChannelAsync()).GetAwaiter().GetResult();
 
             _channel.QueueDeclareAsync(
-                queue: "TalonQueue",
+                queue: "WindowsQueue",
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
@@ -42,24 +41,21 @@ namespace GetTicket.Services
             );
         }
 
-        public async Task SendTicketAsync(Ticket ticket)
+        [HttpPost]
+        public async Task SendWindowStatus(WindowDTO windowDto)
         {
             try
             {
                 var message = new
                 {
-                    MessageId = Guid.NewGuid().ToString(),
-                    ticket.TalonNumber,
-                    Action = "TicketCreated",
-                    Timestamp = ticket.IssuedAt,
-                    ticket.ServiceCode,
-                    PendingTime = ticket.PendingTime ?? null
+                    windowDto.WindowNumber,
+                    windowDto.Status,
                 };
 
                 var json = JsonSerializer.Serialize(message);
                 var body = Encoding.UTF8.GetBytes(json);
 
-                var properties = new BasicProperties()
+                var properties =  new BasicProperties()
                 {
                     Persistent = true,
                     MessageId = Guid.NewGuid().ToString(),
@@ -74,27 +70,30 @@ namespace GetTicket.Services
                     basicProperties: properties,
                     body: body);
 
-                _logger.LogInformation("✅ Ticket {TicketNumber} sent directly to RabbitMQ", ticket.TalonNumber);
+                await _channel.BasicPublishAsync(
+                    exchange: "",
+                    routingKey: "WindowsQueue",
+                    mandatory: false,
+                    basicProperties: properties,
+                    body: body
+                );
+
+                _logger.LogInformation("✅ Window status sent to RabbitMQ: {WindowNumber} - {Status}",
+                    windowDto.WindowNumber, windowDto.Status);
+
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error sending ticket {TicketNumber} to RabbitMQ", ticket.TalonNumber);
+                _logger.LogError(ex, "❌ Error sending window status to RabbitMQ", windowDto.WindowNumber, windowDto.Status);
             }
         }
 
-        public async ValueTask DisposeAsync()
-        {
-            if (_channel != null)
-            {
-                await _channel.CloseAsync();
-                _channel.Dispose();
-            }
+        public enum WindowsStatus { free = 0, busy = 1 }
 
-            if (_connection != null)
-            {
-                await _connection.CloseAsync();
-                _connection.Dispose();
-            }
+        public class WindowDTO
+        {
+            public string? WindowNumber { get; set; }
+            public WindowsStatus? Status { get; set; }
         }
     }
 }
