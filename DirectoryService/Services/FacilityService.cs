@@ -122,6 +122,34 @@ namespace DirectoryService.Services
                     throw;
                 }
             }
+
+            public async Task<bool> DeleteFacilityAsync(Guid id)
+            {
+                try
+                {
+                    var facilityExists = await _facilityRepository.FacilityExistsAsync(id);
+                    if (!facilityExists)
+                    {
+                        throw new KeyNotFoundException($"Учреждение с ID {id} не найдено.");
+                    }
+
+                    var result = await _facilityRepository.DeleteFacilityAsync(id);
+                    return result;
+                }
+                catch (KeyNotFoundException)
+                {
+                    throw;
+                }
+                catch (InvalidOperationException ex) when (ex.Message.Contains("нельзя удалить"))
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Ошибка при удалении учреждения: {ex.Message}", ex);
+                }
+            }
+
             public async Task<bool> FacilityExistsAsync(Guid id)
             {
                 try

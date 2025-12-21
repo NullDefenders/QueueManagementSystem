@@ -6,28 +6,24 @@
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 8082
-EXPOSE 8083
-
-ENV ASPNETCORE_URLS=http://0.0.0.0:8082;https://0.0.0.0:8083
-ENV ASPNETCORE_HTTP_PORTS=8082
-ENV ASPNETCORE_HTTPS_PORTS=8083
+EXPOSE 8080
+EXPOSE 8081
 
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["DirectoryService.csproj", "."]
-RUN dotnet restore "DirectoryService.csproj"
+COPY ["DirectoryService/DirectoryService.csproj", "DirectoryService/"]
+RUN dotnet restore "./DirectoryService/DirectoryService.csproj"
 COPY . .
-RUN dotnet build "DirectoryService.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
+WORKDIR "/src/DirectoryService"
+RUN dotnet build "./DirectoryService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "DirectoryService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./DirectoryService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final

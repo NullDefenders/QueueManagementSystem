@@ -12,6 +12,8 @@ namespace DirectoryService.Services
 
         Task<FacilityDto> UpdateFacilityAsync(Guid id, string code, string name, string address);
 
+        Task<bool> DeleteFacilityAsync(Guid id);
+
         Task<bool> FacilityExistsAsync(Guid id);
     }
 }

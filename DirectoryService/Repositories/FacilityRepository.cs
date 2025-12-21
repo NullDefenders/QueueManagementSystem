@@ -1,6 +1,7 @@
 ﻿using DirectoryService.Data;
 using DirectoryService.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace DirectoryService.Repositories
 {
@@ -28,7 +29,6 @@ namespace DirectoryService.Repositories
 
         public async Task<Facility> CreateFacilityAsync(string code, string name, string address)
         {
-            // Проверка на уникальность кода (опционально)
             var existingFacility = await _dbContext.Facilities
                 .FirstOrDefaultAsync(f => f.Code == code && f.IsActive);
 
@@ -42,7 +42,7 @@ namespace DirectoryService.Repositories
                 Id = Guid.NewGuid(),
                 Code = code.Trim(),
                 Name = name.Trim(),
-                Address = address.Trim(),
+                Address = address?.Trim() ?? string.Empty,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
             };
@@ -63,7 +63,6 @@ namespace DirectoryService.Repositories
                 throw new KeyNotFoundException($"Учреждение с ID {facilityId} не найдено.");
             }
 
-            // Проверка на уникальность кода (опционально, но исключая текущее учреждение)
             var duplicateCode = await _dbContext.Facilities
                 .FirstOrDefaultAsync(f => f.Code == code && f.Id != facilityId && f.IsActive);
 
@@ -74,12 +73,41 @@ namespace DirectoryService.Repositories
 
             facility.Code = code.Trim();
             facility.Name = name.Trim();
-            facility.Address = address.Trim();
+            facility.Address = address?.Trim() ?? string.Empty;
 
             _dbContext.Facilities.Update(facility);
             await _dbContext.SaveChangesAsync();
 
             return facility;
+        }
+
+        public async Task<bool> DeleteFacilityAsync(Guid facilityId)
+        {
+            var facility = await _dbContext.Facilities
+                .FirstOrDefaultAsync(f => f.Id == facilityId && f.IsActive);
+
+            if (facility == null)
+            {
+                return false;
+            }
+
+            var hasDepartments = await _dbContext.Departments
+                .AnyAsync(d => d.FacilityId == facilityId && d.IsActive);
+
+            if (hasDepartments)
+            {
+                throw new InvalidOperationException(
+                    "Нельзя удалить учреждение, у которого есть активные подразделения. " +
+                    "Сначала удалите или деактивируйте все подразделения.");
+            }
+
+            facility.IsActive = false;
+            facility.DeletedAt = DateTime.UtcNow;
+
+            _dbContext.Facilities.Update(facility);
+            await _dbContext.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> FacilityExistsAsync(Guid facilityId)

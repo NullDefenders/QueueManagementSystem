@@ -1,0 +1,137 @@
+﻿@page "/queue-settings"
+@using QueueAdminPanel.Models
+@using QueueAdminPanel.Services
+@using Microsoft.AspNetCore.Components.Web
+@inject IQueueSettingsService QueueSettingsService
+@rendermode RenderMode.InteractiveServer
+@inject IJSRuntime jsRuntime
+
+<PageTitle>Настройки электронной очереди</PageTitle>
+
+@if (isLoading)
+{
+    <p>Загрузка...</p>
+}
+else
+{
+    <h3>Настройки электронной очереди</h3>
+    <br />
+
+    <div class="mb-3">
+        <label class="form-label">Время, за которое можно приглашать до записи:</label>
+        <NumberInput TValue="int" @bind-Value="settings.MinutesBeforePending" Placeholder="0" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Время ожидания перед следующим вызовом:</label>
+        <NumberInput TValue="int" @bind-Value="settings.MinutesAfterPending" Placeholder="0" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Максимальное кол-во клиентов по записи подряд:</label>
+        <NumberInput TValue="int" @bind-Value="settings.PendingCount" Placeholder="0" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="OnSaveClick" disabled="@isSaving">
+        @if (isSaving)
+        {
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+            <span> Сохранение...</span>
+        }
+        else
+        {
+            <span>Сохранить</span>
+        }
+    </button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+    @if (!string.IsNullOrEmpty(successMessage))
+    {
+        <div class="alert alert-success mt-3">@successMessage</div>
+    }
+}
+
+@code {
+    private static readonly Guid QueueId = Guid.Parse("e5d9f8e3-0fe4-4a37-bce4-968a99fb1c5e");
+
+    private QueueSettingsResponseDto settings = new();
+
+    private bool isLoading = true;
+    private bool isSaving = false;
+
+    private string errorMessage = string.Empty;
+    private string successMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            settings = await QueueSettingsService.GetQueueSettingsAsync(QueueId);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Ошибка загрузки: {ex.Message}";
+            Console.WriteLine($"Ошибка загрузки: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task OnSaveClick()
+    {
+        if (isSaving) return;
+
+        isSaving = true;
+        errorMessage = string.Empty;
+        successMessage = string.Empty;
+
+        try
+        {
+            if (settings == null)
+            {
+                errorMessage = "При загрузке страницы произошла ошибка. Обратитесь к вашему системному администратору.";
+                return;
+            }
+
+            var requestDto = new UpdateQueueSettingsRequestDto
+            {
+                MinutesBeforePending = settings.MinutesBeforePending,
+                MinutesAfterPending = settings.MinutesAfterPending,
+                PendingCount = settings.PendingCount
+            };
+
+            bool success = await QueueSettingsService.UpdateQueueSettingsAsync(QueueId, requestDto);
+
+            if (success)
+            {
+                successMessage = "Настройки успешно сохранены!";
+                StateHasChanged();
+                _ = HideSuccessMessageAfterDelay();
+            }
+            else
+            {
+                errorMessage = "Возникла ошибка при сохранении настроек. Обратитесь к вашему системному администратору.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Исключение: {ex}");
+            errorMessage = $"Ошибка: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HideSuccessMessageAfterDelay()
+    {
+        await Task.Delay(3000);
+        successMessage = string.Empty;
+        await InvokeAsync(StateHasChanged);
+    }
+}

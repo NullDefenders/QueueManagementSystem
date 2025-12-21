@@ -14,7 +14,6 @@ namespace DirectoryService.Models.DTOs
         [Display(Name = "Название учреждения")]
         public string Name { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Адрес учреждения обязателен")]
         [StringLength(500, ErrorMessage = "Адрес не должен превышать 500 символов")]
         [Display(Name = "Адрес учреждения")]
         public string Address { get; set; } = string.Empty;
