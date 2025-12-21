@@ -12,6 +12,20 @@ html, body, #root, .App {
   text-align: center;
 }
 
+:root {
+    --border-color: #ddd;
+    --bg-color: #f9f9f9;
+    --text-color: #333;
+    --secondary-text-color: #555;
+}
+
+[data-theme="dark"] {
+    --border-color: #444;
+    --bg-color: #2d2d2d;
+    --text-color: #f0f0f0;
+    --secondary-text-color: #aaa;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

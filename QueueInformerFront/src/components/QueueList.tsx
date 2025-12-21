@@ -16,12 +16,13 @@ const QueueList: React.FC<QueueListProps> = ({ queue }) => {
                         margin: '5px 0', 
                         border: '1px solid #ddd', 
                         borderRadius: '4px',
-                        backgroundColor: '#f9f9f9'
+                        backgroundColor: 'var(--bg-color, #f9f9f9)',
+                        color: 'var(--text-color, #333)'
                     }}
                 >
                     <strong>Номер талона: {talon.TalonNumber}</strong>
                     {talon.PendingTime && (
-                        <span style={{ marginLeft: '10px', color: '#555' }}>
+                        <span style={{ marginLeft: '10px', color: 'var(--secondary-text-color, #555)' }}>
                             (Время записи: {talon.PendingTime})
                         </span>
                     )}
