@@ -64,13 +64,25 @@ public class RabbitMQService : IAsyncDisposable
 
   private async Task SetupQueueConsumer(string queueName, CancellationToken cancellationToken)
   {
-    await _channel.QueueDeclareAsync(
-        queue: queueName,
+    await _channel.ExchangeDeclareAsync(
+        exchange: queueName,
+        type: ExchangeType.Fanout,
         durable: true,
-        exclusive: false,
+        autoDelete: false
+    );
+
+    await _channel.QueueDeclareAsync(
+        queue: $"{queueName}-QueueService",
+        durable: true,
+        exclusive: true,
         autoDelete: false,
-        arguments: null,
         cancellationToken: cancellationToken
+    );
+
+    await _channel.QueueBindAsync(
+        queue: $"{queueName}-QueueService",
+        exchange: queueName,
+        routingKey: ""
     );
 
     var processor = _processorFactory.CreateProcessor(queueName);
@@ -82,8 +94,8 @@ public class RabbitMQService : IAsyncDisposable
 
     };
 
-    await _channel.BasicConsumeAsync(queueName, false, consumer);
-    _logger.LogInformation("Subscribed to queue: {QueueName}", queueName);
+    await _channel.BasicConsumeAsync($"{queueName}-QueueService", false, consumer);
+    _logger.LogInformation("Subscribed to queue: {QueueName}", $"{queueName}-QueueService");
   }
 
   private async Task ProcessMessageAsync(BasicDeliverEventArgs ea, string queueName, IMessageProcessor processor)
@@ -106,12 +118,11 @@ public class RabbitMQService : IAsyncDisposable
 
  public async Task SendQueue(QueueDTO queue)
   {
-    await _channel.QueueDeclareAsync(
-        queue: _configuration["Queues:Queue"],
+    await _channel.ExchangeDeclareAsync(
+        exchange: _configuration["Queues:Queue"],
+        type: ExchangeType.Fanout,
         durable: true,
-        exclusive: false,
-        autoDelete: false,
-        arguments: null
+        autoDelete: false
     );
 
     var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(queue));
@@ -132,9 +143,9 @@ public class RabbitMQService : IAsyncDisposable
     };
 
     await _channel.BasicPublishAsync(
-      exchange: "",
-      routingKey: _configuration["Queues:Queue"],
-      mandatory: true,
+      exchange: _configuration["Queues:Queue"],
+      routingKey: "",
+      mandatory: false,
       basicProperties: properties,
       body: body
     );

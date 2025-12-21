@@ -48,17 +48,30 @@ public class RabbitMQService : IAsyncDisposable
         // Объявляем все очереди
         foreach (var queueName in _queueNames)
         {
+            await _channel.ExchangeDeclareAsync(
+                exchange: queueName,
+                type: ExchangeType.Fanout,
+                durable: true,
+                autoDelete: false
+            );
+
             await _channel.QueueDeclareAsync(
-                queue: queueName,
+                queue: $"{queueName}-QueueInformer",
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null,
                 cancellationToken: cancellationToken
             );
+
+            await _channel.QueueBindAsync(
+                queue: $"{queueName}-QueueInformer",
+                exchange: queueName,
+                routingKey: ""
+            );
         }
 
-    var consumer = new AsyncEventingBasicConsumer(_channel);
+        var consumer = new AsyncEventingBasicConsumer(_channel);
 
 
     consumer.ReceivedAsync += async (model, ea) =>
@@ -104,13 +117,13 @@ public class RabbitMQService : IAsyncDisposable
         foreach (var queueName in _queueNames)
         {
             await _channel.BasicConsumeAsync(
-                queue: queueName,
+                queue: $"{queueName}-QueueInformer",
                 autoAck: false, // важно: ручное подтверждение
                 consumer: consumer,
                 cancellationToken: cancellationToken
             );
 
-            Console.WriteLine($"Subscribed to queue: {queueName}");
+            Console.WriteLine($"Subscribed to queue: {queueName}-QueueInformer");
         }
     }
 
