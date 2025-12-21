@@ -33,10 +33,10 @@ namespace GetTicket.Services
             _connection = Task.Run(async () => await factory.CreateConnectionAsync()).GetAwaiter().GetResult();
             _channel = Task.Run(async () => await _connection.CreateChannelAsync()).GetAwaiter().GetResult();
 
-            _channel.QueueDeclareAsync(
-                queue: "TalonQueue",
+            _channel.ExchangeDeclareAsync(
+                exchange: "TalonQueue",
+                type: ExchangeType.Fanout,
                 durable: true,
-                exclusive: false,
                 autoDelete: false,
                 arguments: null
             );
@@ -68,9 +68,9 @@ namespace GetTicket.Services
                 };
 
                 await _channel.BasicPublishAsync(
-                    exchange: "",
-                    routingKey: "TalonQueue",
-                    mandatory: false,
+                    exchange: "TalonQueue",
+                    routingKey: "",
+                    mandatory: true,
                     basicProperties: properties,
                     body: body);
 

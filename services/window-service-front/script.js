@@ -1,6 +1,6 @@
 class WindowService {
   constructor() {
-    this.apiUrl = "https://localhost:7155/api/Window";
+    this.apiUrl = "http://localhost:8084/api/Window";
     this.history = JSON.parse(localStorage.getItem("windowHistory")) || [];
     this.init();
   }

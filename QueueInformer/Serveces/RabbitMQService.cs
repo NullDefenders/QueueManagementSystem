@@ -31,7 +31,7 @@ public class RabbitMQService : IAsyncDisposable
 
         _connectionFactory = new ConnectionFactory()
         {
-          HostName = rabbitConfig["HostName"] ?? "localhost",
+          HostName = rabbitConfig["HostName"] ?? "rabbitmq",
           Port = int.Parse(rabbitConfig["Port"] ?? "5672"),
           UserName = rabbitConfig["UserName"] ?? "guest",
           Password = rabbitConfig["Password"] ?? "guest",

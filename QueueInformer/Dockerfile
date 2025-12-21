@@ -4,8 +4,12 @@
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 8086
+EXPOSE 8087
+
+ENV ASPNETCORE_URLS=http://0.0.0.0:8086;https://0.0.0.0:8087
+ENV ASPNETCORE_HTTP_PORTS=8086
+ENV ASPNETCORE_HTTPS_PORTS=8087
 
 
 # Этот этап используется для сборки проекта службы
@@ -15,7 +19,6 @@ WORKDIR /src
 COPY ["QueueInformer.csproj", "."]
 RUN dotnet restore "./QueueInformer.csproj"
 COPY . .
-WORKDIR "/src/."
 RUN dotnet build "./QueueInformer.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Этот этап используется для публикации проекта службы, который будет скопирован на последний этап

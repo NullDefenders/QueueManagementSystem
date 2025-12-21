@@ -22,7 +22,7 @@ namespace WindowService.Controllers
 
             var factory = new ConnectionFactory()
             {
-                HostName = "localhost",
+                HostName = "rabbitmq",
                 Port = 5672,
                 UserName = "admin",
                 Password = "password",
@@ -32,10 +32,10 @@ namespace WindowService.Controllers
             _connection = Task.Run(async () => await factory.CreateConnectionAsync()).GetAwaiter().GetResult();
             _channel = Task.Run(async () => await _connection.CreateChannelAsync()).GetAwaiter().GetResult();
 
-            _channel.QueueDeclareAsync(
-                queue: "WindowsQueue",
+            _channel.ExchangeDeclareAsync(
+                exchange: "WindowsQueue",
+                type: ExchangeType.Fanout,
                 durable: true,
-                exclusive: false,
                 autoDelete: false,
                 arguments: null
             );
@@ -46,10 +46,12 @@ namespace WindowService.Controllers
         {
             try
             {
+                string status = windowDto.Status == WindowsStatus.free ? "free" : "busy";
+                Console.WriteLine(status);
                 var message = new
                 {
                     windowDto.WindowNumber,
-                    windowDto.Status,
+                    status,
                 };
 
                 var json = JsonSerializer.Serialize(message);
@@ -64,15 +66,8 @@ namespace WindowService.Controllers
                 };
 
                 await _channel.BasicPublishAsync(
-                    exchange: "",
-                    routingKey: "TalonQueue",
-                    mandatory: false,
-                    basicProperties: properties,
-                    body: body);
-
-                await _channel.BasicPublishAsync(
-                    exchange: "",
-                    routingKey: "WindowsQueue",
+                    exchange: "WindowsQueue",
+                    routingKey: "",
                     mandatory: false,
                     basicProperties: properties,
                     body: body
@@ -88,12 +83,12 @@ namespace WindowService.Controllers
             }
         }
 
-        public enum WindowsStatus { free = 0, busy = 1 }
+        public enum WindowsStatus { free, busy };
 
         public class WindowDTO
         {
             public string? WindowNumber { get; set; }
-            public WindowsStatus? Status { get; set; }
+            public WindowsStatus Status { get; set; }
         }
     }
 }
