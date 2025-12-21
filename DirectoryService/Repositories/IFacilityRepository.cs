@@ -12,6 +12,8 @@ namespace DirectoryService.Repositories
 
         Task<Facility> UpdateFacilityAsync(Guid facilityId, string code, string name, string address);
 
+        Task<bool> DeleteFacilityAsync(Guid facilityId);
+
         Task<bool> FacilityExistsAsync(Guid facilityId);
     }
 }

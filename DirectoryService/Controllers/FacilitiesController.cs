@@ -181,5 +181,48 @@ namespace DirectoryService.Controllers
 
             return Ok(departments);
         }
+
+        /// <summary>
+        /// Удалить учреждение
+        /// </summary>
+        /// <param name="facilityId">Идентификатор учреждения (GUID)</param>
+        /// <response code="204">Учреждение успешно удалено</response>
+        /// <response code="400">Неверный формат идентификатора</response>
+        /// <response code="404">Учреждение не найдено</response>
+        /// <response code="409">Конфликт (нельзя удалить учреждение с подразделениями)</response>
+        /// <response code="500">Внутренняя ошибка сервера</response>
+        [HttpDelete("{facilityId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteFacility(Guid facilityId)
+        {
+            if (facilityId == Guid.Empty)
+                return BadRequest("Идентификатор учреждения не может быть пустым.");
+
+            try
+            {
+                var success = await _facilityService.DeleteFacilityAsync(facilityId);
+
+                if (success)
+                    return NoContent();
+                else
+                    return NotFound($"Учреждение с ID {facilityId} не найдено.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Внутренняя ошибка сервера");
+            }
+        }
     }
 }
