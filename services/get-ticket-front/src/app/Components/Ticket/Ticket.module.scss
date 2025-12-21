@@ -1,20 +1,32 @@
 .ticket {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  margin: auto;
   width: 400px;
   height: 300px;
-  padding: 20px;
   border: 1px solid var(--black);
+  border-radius: 8px;
   box-sizing: border-box;
 }
 
 .ticket__title {
-  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  padding: 15px;
   font-size: 18px;
   font-weight: 600;
   text-transform: uppercase;
+  border-radius: 6px 6px 0 0;
+  background: var(--blue);
+  color: var(--white);
+}
+
+.ticket__mainInfoContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
 }
 
 .ticket__service {
@@ -32,6 +44,14 @@
   font-size: 44px;
   font-weight: 800;
   text-transform: uppercase;
+  color: var(--blue);
+}
+
+.ticket__dateInfoContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 15px;
+  border-top: 1px solid;
 }
 
 .ticket__date {

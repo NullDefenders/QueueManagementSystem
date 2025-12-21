@@ -3,6 +3,8 @@
   --black: #171717;
   --text: #44495d;
   --red: #b3000f;
+  --purple: #9e2cca;
+  --blue: #3479e0;
 }
 
 html,
@@ -13,7 +15,8 @@ body {
 
 body {
   color: var(--text);
-  background: var(--white);
+  background: url("/background.jpg");
+  background-size: cover;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

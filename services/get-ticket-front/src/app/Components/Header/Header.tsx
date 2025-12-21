@@ -13,7 +13,7 @@ export const Header = (props: HeaderProps) => {
     <header className={styles.header}>
       <Image
         className={styles.header__logo}
-        src="/queue-logo.jpg"
+        src="/logo-queue-1.png"
         height={208}
         width={400}
         alt="logo"
