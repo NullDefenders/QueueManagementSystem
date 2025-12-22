@@ -15,9 +15,14 @@ namespace QueueAdminPanel
 
             builder.Services.AddBlazorBootstrap();
 
-            builder.Services.AddHttpClient<IQueueSettingsService, QueueSettingsService>(client =>
+            builder.Services.AddHttpClient<IQueueSettingsService, QueueSettingsService>((services, client) =>
             {
-                client.BaseAddress = new Uri("https://localhost:44348/");
+                var config = services.GetRequiredService<IConfiguration>();
+
+                var backendHost = config["BackendHost"] ?? "localhost";
+                var backendPort = config["BackendPort"] ?? "8082";
+
+                client.BaseAddress = new Uri($"http://{backendHost}:{backendPort}/");
             });
 
             var app = builder.Build();
@@ -30,7 +35,7 @@ namespace QueueAdminPanel
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+//            app.UseHttpsRedirection();
 
             app.UseStaticFiles();
             app.UseAntiforgery();

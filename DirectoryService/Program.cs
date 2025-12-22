@@ -39,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "DirectoryService API",
         Version = "v1",
-        Description = "API äëÿ óïðàâëåíèÿ ñïðàâî÷íèêàìè ñèñòåìû ýëåêòðîííîé î÷åðåäè",
+        Description = "API Ð´Ð»Ñ ÑƒÐ¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ñ ÑÐ¿Ñ€Ð°Ð²Ð¾Ñ‡Ð½Ð¸ÐºÐ°Ð¼Ð¸ ÑÐ¸ÑÑ‚ÐµÐ¼Ñ‹ ÑÐ»ÐµÐºÑ‚Ñ€Ð¾Ð½Ð½Ð¾Ð¹ Ð¾Ñ‡ÐµÑ€ÐµÐ´Ð¸",
         Contact = new OpenApiContact { Name = "Null Defenders", Email = "nulldefenders@gmail.com" }
     });
 
@@ -54,16 +54,15 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "DirectoryService API v1");
-    });
-}
+app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "DirectoryService API v1");
+});
+
+
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

@@ -5,6 +5,11 @@
 
 .env
 
+# Sertificate!
+*.pem
+*.crt
+*.key
+
 # User-specific files
 *.rsuser
 *.suo

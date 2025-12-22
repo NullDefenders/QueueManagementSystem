@@ -1,0 +1,166 @@
+﻿services:
+  nginx:
+    image: nginx:mainline-alpine3.23
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./Nginx/certs:/etc/nginx/certs:ro
+      - ./QueueInformer/QueueInformerFront/dist:/usr/share/nginx/informer:ro
+      - ./GetTicket/get-ticket-front/out:/usr/share/nginx/getticket:ro
+      - ./WindowService/window-service-front:/usr/share/nginx/windowservice:ro
+      - ./Dashboard:/usr/share/nginx/dashboard:ro
+      - ./PreRegistrationService/Frontend/PreRegistrationService/dist:/usr/share/nginx/preregistration:ro
+
+  rabbitmq:
+    image: rabbitmq:3.13.7-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password
+      - RABBITMQ_DEFAULT_VHOST=/
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Web UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # ← том для данных
+      - rabbitmq_logs:/var/log/rabbitmq   # ← том для логов
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+      
+  redis:
+    image: redis/redis-stack:latest
+    container_name: redis-stack
+    environment:
+      - REDIS_STACK_ACCEPT_TERMS=yes      # Принимаем EULA
+      - REDIS_STACK_DATA_DIR=/data        # Директория данных
+      - REDIS_STACK_INSECURE_MODE=true    # Для разработки
+    ports:
+      - "6379:6379" # Redis
+      - "8001:8001" # Web UI
+    volumes:
+      - redis_data:/data                  # Сохраняем данные
+      - redis_config:/etc/redis-stack     # Сохраняем конфиг
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  queue-service:
+    build: /QueueService
+    container_name: queue-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=admin
+      - RabbitMQ__Password=password
+      - RabbitMQ__Port=5672
+      - Redis__Host=redis
+      - ASPNETCORE_URLS=http://0.0.0.0:8085;
+    restart: unless-stopped
+
+  directory-service:
+    build:
+      context: /DirectoryService
+    container_name: directory-service
+    ports:
+      - "8082:8082"
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:8082;
+    restart: unless-stopped
+
+  adminpanel-service:
+    build:
+      context: /QueueAdminPanel
+    container_name: adminpanel-service
+    ports:
+      - "8083:8083"
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:8083;
+      - BackendHost=directory-service
+      - BackendPort=8082
+    restart: unless-stopped
+
+  informer-service:
+    build:
+      context: /QueueInformer/QueueInformer
+    container_name: informer-service
+    depends_on:
+        rabbitmq:
+          condition: service_healthy
+    environment:
+        - RabbitMQ__HostName=rabbitmq
+        - RabbitMQ__UserName=admin
+        - RabbitMQ__Password=password
+        - RabbitMQ__Port=5672
+        - ASPNETCORE_URLS=http://0.0.0.0:8086;
+    ports:
+      - "8086:8086"
+    restart: unless-stopped
+
+  getticket-service:
+    build:
+      context: /GetTicket/GetTicket
+    container_name: getticket-service
+    depends_on:
+        rabbitmq:
+          condition: service_healthy
+    environment:
+        - RabbitMQ__HostName=rabbitmq
+        - RabbitMQ__UserName=admin
+        - RabbitMQ__Password=password
+        - RabbitMQ__Port=5672
+        - ASPNETCORE_URLS=http://0.0.0.0:8080;
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  window-service:
+    build:
+      context: /WindowService/window-service
+    container_name: window-service
+    depends_on:
+        rabbitmq:
+          condition: service_healthy
+    environment:
+        - RabbitMQ__HostName=rabbitmq
+        - RabbitMQ__UserName=admin
+        - RabbitMQ__Password=password
+        - RabbitMQ__Port=5672
+        - ASPNETCORE_URLS=http://0.0.0.0:8084;
+    ports:
+      - "8084:8084"
+    restart: unless-stopped
+
+  preregistration-service:
+    build:
+      context: /PreRegistrationService
+    container_name: preregistration-service
+    environment:
+        - ASPNETCORE_URLS=http://0.0.0.0:8087;
+    ports:
+      - "8087:8087"
+    restart: unless-stopped
+
+volumes:
+  rabbitmq_data:
+    driver: local
+  rabbitmq_logs:
+    driver: local
+  redis_data:
+    driver: local
+  redis_config:
+    driver: local
