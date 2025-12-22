@@ -5,11 +5,11 @@ import { useState } from "react";
 import { Header } from "./Components/Header/Header";
 import { OptionButton } from "./Components/Options/OptionButton/OptionButton";
 import { Ticket } from "./Components/Ticket/Ticket";
+import { Options } from "./Components/Options/Options";
+import { StepCategories } from "./Components/steps/StepCategories/StepCategories";
 import { IDepartment, IService, Steps, ITicket } from "./types";
 
 import styles from "./page.module.scss";
-import { Options } from "./Components/Options/Options";
-import { StepCategories } from "./Components/steps/StepCategories/StepCategories";
 
 const departments: IDepartment[] = [
   {
