@@ -1,0 +1,170 @@
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/app/Components/Header/Header.module.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Header_header__8Q5L7 {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.Header_header__logo__r5VAo {
+  cursor: pointer;
+}
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/app/Components/Options/OptionButton/OptionButton.module.scss ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.OptionButton_optionButtonContainer__62gAs {
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
+.OptionButton_optionButton__QSU_P {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  width: 350px;
+  height: 85px;
+  border-radius: 10px;
+  background: #cad3e4;
+  border: 2px solid #2f3c5f;
+  cursor: pointer;
+}
+.OptionButton_optionButton__QSU_P:hover {
+  background: #afbcd5;
+}
+
+.OptionButton_optionButton__title__9qg9q {
+  font-size: 15px;
+  font-weight: 600;
+}
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/app/Components/Ticket/Ticket.module.scss ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Ticket_ticket__fmryx {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  height: 300px;
+  padding: 20px;
+  border: 1px solid var(--black);
+  box-sizing: border-box;
+}
+
+.Ticket_ticket__title__2PqlX {
+  margin-bottom: 30px;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.Ticket_ticket__service__AtcaV {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.Ticket_ticket__numberTitle__YquTJ {
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.Ticket_ticket__number__XVH9I {
+  font-size: 44px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.Ticket_ticket__date__vPWLO {
+  margin-bottom: 10px;
+}
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/app/page.module.scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.page_page__KdIv3 {
+  --gray-rgb: 0, 0, 0;
+  --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
+  --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+  font-family: var(--font-geist-sans);
+}
+
+.page_main__akH3E {
+  display: flex;
+  justify-content: center;
+  width: 1160px;
+  min-height: 565px;
+  margin: auto;
+  margin-bottom: 50px;
+  padding: 20px;
+  border: 10px solid;
+  border-radius: 10px;
+}
+
+.page_departmentList__JKrVj {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  width: 1100px;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/app/Components/Options/Options.module.scss ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.Options_options__vnbJh {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  width: 1100px;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[7].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[14].oneOf[7].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[14].oneOf[7].use[5]!./src/app/Components/steps/StepCategories/StepCategories.module.scss ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.StepCategories_stepCategories__UfF7n {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.StepCategories_stepCategories__title__YaeDB {
+  margin: 20px auto;
+}
+
+.StepCategories_stepCategories__inputLabelContainer__FIXBO {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 50px 0;
+}
+
+.StepCategories_stepCategories__inputLabel__UIJBU {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.StepCategories_stepCategories__inputContainer__m3iSf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.StepCategories_stepCategories__input__bicW4 {
+  width: 200px;
+  height: 50px;
+  margin: auto;
+  padding: 0 10px;
+  font-size: 30px;
+}
+
+.StepCategories_stepCategories__inputError__MUnTL {
+  color: var(--red);
+}

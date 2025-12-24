@@ -1,0 +1,29 @@
+/* [project]/src/app/Components/Options/OptionButton/OptionButton.module.scss.module.css [app-client] (css) */
+.OptionButton-module-scss-module__U6zjra__optionButtonContainer {
+  height: fit-content;
+}
+
+.OptionButton-module-scss-module__U6zjra__optionButton {
+  cursor: pointer;
+  background: #cad3e4;
+  border: 2px solid #2f3c5f;
+  border-radius: 10px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  width: 350px;
+  height: 85px;
+  padding: 10px;
+  display: flex;
+}
+
+.OptionButton-module-scss-module__U6zjra__optionButton:hover {
+  background: #afbcd5;
+}
+
+.OptionButton-module-scss-module__U6zjra__optionButton__title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/*# sourceMappingURL=c80d1_Components_Options_OptionButton_OptionButton_module_scss_module_css_bad6b30c._.single.css.map*/

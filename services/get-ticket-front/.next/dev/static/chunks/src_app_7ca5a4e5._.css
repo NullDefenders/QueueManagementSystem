@@ -1,0 +1,183 @@
+/* [project]/src/app/Components/Header/Header.module.scss.module.css [app-client] (css) */
+.Header-module-scss-module__AZN84q__header {
+  justify-content: center;
+  padding: 10px;
+  display: flex;
+}
+
+.Header-module-scss-module__AZN84q__header__logo {
+  cursor: pointer;
+}
+
+/* [project]/src/app/Components/Options/OptionButton/OptionButton.module.scss.module.css [app-client] (css) */
+.OptionButton-module-scss-module__U6zjra__optionButtonContainer {
+  height: fit-content;
+}
+
+.OptionButton-module-scss-module__U6zjra__optionButton {
+  cursor: pointer;
+  background: #cad3e4;
+  border: 2px solid #2f3c5f;
+  border-radius: 10px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  width: 350px;
+  height: 85px;
+  padding: 10px;
+  display: flex;
+}
+
+.OptionButton-module-scss-module__U6zjra__optionButton:hover {
+  background: #afbcd5;
+}
+
+.OptionButton-module-scss-module__U6zjra__optionButton__title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* [project]/src/app/Components/Ticket/Ticket.module.scss.module.css [app-client] (css) */
+.Ticket-module-scss-module__iU37Ma__ticket {
+  border: 1px solid var(--black);
+  box-sizing: border-box;
+  border-radius: 8px;
+  flex-direction: column;
+  width: 400px;
+  height: 300px;
+  margin: auto;
+  display: flex;
+}
+
+.Ticket-module-scss-module__iU37Ma__ticket__title {
+  text-transform: uppercase;
+  background: var(--blue);
+  color: var(--white);
+  border-radius: 6px 6px 0 0;
+  justify-content: center;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+}
+
+.Ticket-module-scss-module__iU37Ma__ticket__mainInfoContainer {
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.Ticket-module-scss-module__iU37Ma__ticket__service {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.Ticket-module-scss-module__iU37Ma__ticket__numberTitle {
+  text-transform: uppercase;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.Ticket-module-scss-module__iU37Ma__ticket__number {
+  text-transform: uppercase;
+  color: var(--blue);
+  font-size: 44px;
+  font-weight: 800;
+}
+
+.Ticket-module-scss-module__iU37Ma__ticket__dateInfoContainer {
+  border-top: 1px solid;
+  flex-direction: column;
+  padding: 5px 15px;
+  display: flex;
+}
+
+.Ticket-module-scss-module__iU37Ma__ticket__date {
+  margin-bottom: 10px;
+}
+
+/* [project]/src/app/page.module.scss.module.css [app-client] (css) */
+.page-module-scss-module__rcUngW__page {
+  --gray-rgb: 0, 0, 0;
+  --gray-alpha-200: rgba(var(--gray-rgb), .08);
+  --gray-alpha-100: rgba(var(--gray-rgb), .05);
+  --button-primary-hover: #383838;
+  --button-secondary-hover: #f2f2f2;
+  font-family: var(--font-geist-sans);
+}
+
+.page-module-scss-module__rcUngW__main {
+  background: #fff;
+  border: 10px solid;
+  border-radius: 10px;
+  justify-content: center;
+  width: 1160px;
+  min-height: 565px;
+  margin: auto auto 50px;
+  padding: 20px;
+  display: flex;
+}
+
+.page-module-scss-module__rcUngW__departmentList {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  width: 1100px;
+  height: fit-content;
+  display: flex;
+}
+
+/* [project]/src/app/Components/Options/Options.module.scss.module.css [app-client] (css) */
+.Options-module-scss-module__0T_Y3W__options {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  width: 1100px;
+  height: fit-content;
+  display: flex;
+}
+
+/* [project]/src/app/Components/steps/StepCategories/StepCategories.module.scss.module.css [app-client] (css) */
+.StepCategories-module-scss-module__2TAraG__stepCategories {
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+.StepCategories-module-scss-module__2TAraG__stepCategories__title {
+  margin: 20px auto;
+}
+
+.StepCategories-module-scss-module__2TAraG__stepCategories__inputLabelContainer {
+  flex-direction: column;
+  gap: 10px;
+  margin: 50px 0;
+  display: flex;
+}
+
+.StepCategories-module-scss-module__2TAraG__stepCategories__inputLabel {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.StepCategories-module-scss-module__2TAraG__stepCategories__inputContainer {
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+.StepCategories-module-scss-module__2TAraG__stepCategories__input {
+  width: 200px;
+  height: 50px;
+  margin: auto;
+  padding: 0 10px;
+  font-size: 30px;
+}
+
+.StepCategories-module-scss-module__2TAraG__stepCategories__inputError {
+  color: var(--red);
+}
+
+/*# sourceMappingURL=src_app_7ca5a4e5._.css.map*/

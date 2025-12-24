@@ -15,6 +15,12 @@ call npm ci
 call npm run build
 
 echo ==============================
+echo Building WindowService
+cd ..\..\WindowService\window-service-front
+call npm ci
+call npm run build
+
+echo ==============================
 echo Building PreRegistrationService
 cd ..\..\PreRegistrationService\Frontend\PreRegistrationService
 call npm ci

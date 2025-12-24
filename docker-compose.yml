@@ -10,7 +10,7 @@
       - ./Nginx/certs:/etc/nginx/certs:ro
       - ./QueueInformer/QueueInformerFront/dist:/usr/share/nginx/informer:ro
       - ./GetTicket/get-ticket-front/out:/usr/share/nginx/getticket:ro
-      - ./WindowService/window-service-front:/usr/share/nginx/windowservice:ro
+      - ./WindowService/window-service-front/out:/usr/share/nginx/windowservice:ro
       - ./Dashboard:/usr/share/nginx/dashboard:ro
       - ./PreRegistrationService/Frontend/PreRegistrationService/dist:/usr/share/nginx/preregistration:ro
 

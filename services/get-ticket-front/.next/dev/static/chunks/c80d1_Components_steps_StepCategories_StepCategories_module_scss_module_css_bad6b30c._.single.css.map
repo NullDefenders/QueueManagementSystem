@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///E:/projects/QueueManagementSystem/services/get-ticket-front/src/app/Components/steps/StepCategories/StepCategories.module.scss"],"sourcesContent":[".stepCategories {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n}\r\n\r\n.stepCategories__title {\r\n  margin: 20px auto;\r\n}\r\n\r\n.stepCategories__inputLabelContainer {\r\n  display: flex;\r\n  flex-direction: column;\r\n  gap: 10px;\r\n  margin: 50px 0;\r\n}\r\n\r\n.stepCategories__inputLabel {\r\n  font-size: 20px;\r\n  font-weight: 600;\r\n}\r\n\r\n.stepCategories__inputContainer {\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n}\r\n\r\n.stepCategories__input {\r\n  width: 200px;\r\n  height: 50px;\r\n  margin: auto;\r\n  padding: 0 10px;\r\n  font-size: 30px;\r\n}\r\n\r\n.stepCategories__inputError {\r\n  color: var(--red);\r\n}\r\n"],"names":[],"mappings":"AAAA;;;;;;AAMA;;;;AAIA;;;;;;;AAOA;;;;;AAKA;;;;;;AAMA;;;;;;;;AAQA"}}]
+}
