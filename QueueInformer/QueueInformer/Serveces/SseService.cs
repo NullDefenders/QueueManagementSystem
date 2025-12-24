@@ -1,7 +1,7 @@
 using System.Text;
-using RabbitMqSse.Models;
+using QueueInformer.Models;
 
-namespace RabbitMqSse.Services;
+namespace QueueInformer.Services;
 
 public interface ISseService
 {
