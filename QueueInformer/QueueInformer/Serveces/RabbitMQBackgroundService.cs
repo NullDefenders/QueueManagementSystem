@@ -1,8 +1,4 @@
-using QueueService.DTO;
-using RabbitMqSse.Models;
-using System.Text.Json;
-
-namespace RabbitMqSse.Services;
+namespace QueueInformer.Services;
 
 public class RabbitMQBackgroundService : BackgroundService
 {
@@ -30,17 +26,13 @@ public class RabbitMQBackgroundService : BackgroundService
         return Task.CompletedTask;
     }
 
-    private void OnMessageReceived(object? sender, BaseDTO message)
+    private void OnMessageReceived(object? sender, string jsonMessage)
     {
         try
         {
-            var jsonMessage = JsonSerializer.Serialize(message, new JsonSerializerOptions
-            {
-                Converters = { new DTOJsonConverter() }
-            });
             
             _sseService.SendToAll(jsonMessage);
-            _logger.LogInformation("Message sent via SSE: {MessageId}", message);
+            _logger.LogInformation("Message sent via SSE: {MessageId}", jsonMessage);
         }
         catch (Exception ex)
         {

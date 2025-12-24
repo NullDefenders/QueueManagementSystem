@@ -69,6 +69,8 @@
       - RabbitMQ__Password=password
       - RabbitMQ__Port=5672
       - Redis__Host=redis
+      - Redis__Port=6379
+      - Redis__Database=0
       - ASPNETCORE_URLS=http://0.0.0.0:8085;
     restart: unless-stopped
 
@@ -101,11 +103,16 @@
     depends_on:
         rabbitmq:
           condition: service_healthy
+        redis:
+          condition: service_healthy
     environment:
         - RabbitMQ__HostName=rabbitmq
         - RabbitMQ__UserName=admin
         - RabbitMQ__Password=password
         - RabbitMQ__Port=5672
+        - Redis__Host=redis
+        - Redis__Port=6379
+        - Redis__Database=1
         - ASPNETCORE_URLS=http://0.0.0.0:8086;
     ports:
       - "8086:8086"

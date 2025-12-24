@@ -1,19 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
+using QueueInformer.Models;
+using QueueInformer.Serveces;
+using QueueInformer.Services;
 using RabbitMQ.Client;
-using RabbitMqSse.Models;
-using RabbitMqSse.Services;
 
-namespace RabbitMqSse.Controllers;
+namespace QueueInformer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class EventsController : ControllerBase
 {
     private readonly ISseService _sseService;
+    private readonly RedisService _redisService;
 
-    public EventsController(ISseService sseService)
+    public EventsController(ISseService sseService, RedisService redisService)
     {
         _sseService = sseService;
+        _redisService = redisService;
     }
 
     [HttpGet]
@@ -26,11 +29,11 @@ public class EventsController : ControllerBase
         await Response.Body.FlushAsync();
 
         _sseService.AddClient(Response.Body);
-
-        var data = $"data: Connected to SSE endpoint\n\n";
-        var bytes = System.Text.Encoding.UTF8.GetBytes(data);
-        await Response.Body.WriteAsync(bytes, 0, bytes.Length);
-        await Response.Body.FlushAsync();
+        foreach (var data in await _redisService.GetMessages()) {
+            var bytes = System.Text.Encoding.UTF8.GetBytes($"data: {data}\n\n");
+            await Response.Body.WriteAsync(bytes, 0, bytes.Length);
+            await Response.Body.FlushAsync(); 
+        }
 
         // Ждем, пока клиент не отключится
         try

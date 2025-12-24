@@ -1,5 +1,4 @@
-// Models/Message.cs
-namespace RabbitMqSse.Models;
+namespace QueueInformer.Models;
 
 public class Message
 {
