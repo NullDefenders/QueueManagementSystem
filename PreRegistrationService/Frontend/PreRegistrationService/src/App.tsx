@@ -1,6 +1,6 @@
 import { Box, Grid, GridItem, HStack, Heading, Text, IconButton, Slider, VStack, Button, Dialog, Input } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
-import apiClient from "./services/api-client";
+import axios from "axios";
 import TimeGrid from "./components/TimeGrid";
 import "./App.css";
 import ServiceList from "./components/ServiceList";
@@ -279,7 +279,8 @@ function App() {
                             serviceName: serviceQuery.service.serviceName
                           };
                           console.log('Полный payload:', payload);
-                          const res = await apiClient.post("https://localhost:44345/record", payload, {
+                          // Используем endpoint через /api - Vite прокси перенаправит запрос на localhost:8087
+                          const res = await axios.post("http://localhost:8087/record", payload, {
                             headers: { "Content-Type": "application/json" },
                           });
                           const code = (res?.data as any)?.recordCode ?? null;

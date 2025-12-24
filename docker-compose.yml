@@ -147,13 +147,19 @@
 
   preregistration-service:
     build:
-      context: /PreRegistrationService
+      context: ./PreRegistrationService
+      dockerfile: Dockerfile
     container_name: preregistration-service
-    environment:
-        - ASPNETCORE_URLS=http://0.0.0.0:8087;
     ports:
       - "8087:8087"
-    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8087
+      - ConnectionStrings__DefaultConnection=mongodb://admin:123@90.156.171.154:27018/prereg?authSource=admin&connectTimeoutMS=30000&serverSelectionTimeoutMS=30000&socketTimeoutMS=30000
+      - ASPNETCORE_STARTUP_ERROR_CONTINUE=true
+    restart: "no"
+    stdin_open: true
+    tty: true 
 
 volumes:
   rabbitmq_data:

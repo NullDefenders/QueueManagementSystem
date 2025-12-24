@@ -24,7 +24,7 @@ const useFacilityDepartments = (facilityId?: string) => {
     setLoading(true);
     
     axios
-      .get<DepartmentsResponse | Department[]>(`http://localhost:8082/api/facilities/${facilityId}`, { 
+      .get<DepartmentsResponse | Department[]>(`http://localhost:8082/api/facilities/${facilityId}/departments`, { 
         signal: controller.signal 
       })
       .then((res) => {

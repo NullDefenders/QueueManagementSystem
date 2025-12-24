@@ -34,7 +34,7 @@ namespace PreRegistrationService.Controllers
         [HttpPost("record")]
         public async Task<ActionResult> Post(RecordForService customer)
         {
-            Record record = new Record(null, customer.accountId, customer.name, customer.surname, customer.recordTime.AddHours(3), _uniqueStringGenerator.Next(), customer.serviceId, customer.categoryPrefix, customer.serviceName);
+            Record record = new Record(null, customer.accountId, customer.name, customer.surname, customer.recordTime, _uniqueStringGenerator.Next(), customer.serviceId, customer.categoryPrefix, customer.serviceName);
             await _recordRepository.AddRecordAsync(record);
             return CreatedAtAction(nameof(GetRecordByIdAccount), new { id = record.AccountID }, record);
         }

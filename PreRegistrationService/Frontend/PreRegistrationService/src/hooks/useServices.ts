@@ -21,7 +21,7 @@ const useServices = (serviceQuery: ServiceQuery) => {
   if (serviceQuery.service?.serviceName) params.serviceName = serviceQuery.service.serviceName;
   if (serviceQuery.service?.categoryPrefix) params.categoryPrefix = serviceQuery.service.categoryPrefix;
 
-  return useData<Service>(`/department/services/${serviceQuery.departmentId}`, {
+  return useData<Service>(`http://localhost:8082/api/departments/${serviceQuery.departmentId}/services`, {
     params: Object.keys(params).length > 0 ? params : undefined
   });
 };

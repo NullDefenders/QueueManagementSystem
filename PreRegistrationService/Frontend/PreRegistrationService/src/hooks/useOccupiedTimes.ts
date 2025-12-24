@@ -23,7 +23,8 @@ const useOccupiedTimes = (date: string | undefined, serviceId: string | undefine
     // Форматируем дату в YYYY-MM-DD (заменяем подчеркивание на дефис, если есть)
     const formattedDate = date.replace(/_/g, "-");
 
-    const url = `https://localhost:44345/allrecordtimeinday/${formattedDate}/${serviceId}`;
+    // Используем endpoint через /api - Vite прокси перенаправит запрос на localhost:8087
+    const url = `http://localhost:8087/allrecordtimeinday/${formattedDate}/${serviceId}`;
     console.log("Запрос занятых времен:", url);
 
     axios
