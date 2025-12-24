@@ -11,6 +11,9 @@ import type {
   EventMessage,
 } from "../types";
 
+import styles from "./EventMonitor.module.scss";
+import clsx from "clsx";
+
 const EventMonitor: React.FC = () => {
   const [queueMap, setQueueMap] = useState<Map<string, TalonInQueue>>(
     () => new Map()
@@ -125,28 +128,17 @@ const EventMonitor: React.FC = () => {
   const freeWindowsArray = Array.from(freeWindows.values());
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-around",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "45%",
-          borderRight: "1px solid #ccc",
-          paddingRight: "20px",
-        }}
-      >
-        <h2 style={{ marginTop: "20px" }}>Очередь</h2>
-        <QueueList queue={queueArray} />
-        <h2 style={{ marginTop: "20px" }}>Свободные окна</h2>
+    <div className={styles.eventMonitor}>
+      <div className={styles.listContainer}>
+        <h2>Свободные окна</h2>
         <FreeWindowsList windows={freeWindowsArray} />
       </div>
-
-      <div style={{ width: "45%", paddingLeft: "20px" }}>
-        <h2>Текущие вызовы</h2>
+      <div className={styles.listContainer}>
+        <h2>Очередь</h2>
+        <QueueList queue={queueArray} />
+      </div>
+      <div className={clsx(styles.listContainer, styles.listContainer_call)}>
+        <h2>Вызовы</h2>
         <WindowCalls calls={callsArray} />
       </div>
     </div>
