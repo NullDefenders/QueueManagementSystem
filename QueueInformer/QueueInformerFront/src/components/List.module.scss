@@ -1,0 +1,33 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  list-style: none;
+  margin: 0;
+}
+
+.item {
+  width: 80px;
+  display: block;
+  padding: 5px 10px;
+  background-color: var(--blue);
+  color: var(--white);
+  border-radius: 3px;
+  font-weight: 600;
+
+  &_call {
+    background-color: var(--purple);
+  }
+}
+
+.callItem {
+  display: flex;
+  align-items: center;
+}
+
+.arrow {
+  margin: 0 5px;
+}

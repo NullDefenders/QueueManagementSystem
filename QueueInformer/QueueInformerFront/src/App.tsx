@@ -1,10 +1,14 @@
-import EventMonitor from './components/EventMonitor';
+import EventMonitor from "./components/EventMonitor";
+
+import "./App.css";
+import logo from "./logo-queue-1.png";
 
 function App() {
   return (
-    <div className="App" style={{ fontFamily: 'Arial, sans-serif', height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', textAlign: 'center'}}>
-      <h1>Монитор Очереди</h1>
-      <hr style={{ margin: '20px 0' }} />
+    <div className="app">
+      <div className="app__header">
+        <img src={logo} width={400} height={208} />
+      </div>
       <EventMonitor />
     </div>
   );

@@ -1,0 +1,17 @@
+.eventMonitor {
+  display: flex;
+  gap: 30px;
+}
+
+.listContainer {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0 10px;
+  width: 250px;
+  height: 500px;
+  border-radius: 8px;
+  border: 2px solid var(--blue);
+
+  &_call {
+    border: 2px solid var(--purple);
+  }
+}

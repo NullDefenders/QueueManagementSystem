@@ -1,37 +1,38 @@
-using QueueService.DTO;
+using QueueInformer.Models;
+using QueueInformer.Serveces;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMqSse.Models;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Channels;
 
 
-namespace RabbitMqSse.Services;
+namespace QueueInformer.Services;
 
 public class RabbitMQService : IAsyncDisposable
 {
     private readonly ILogger<RabbitMQService> _logger;
     private readonly ConnectionFactory _connectionFactory;
+    private readonly RedisService _redisService;
     private readonly IConfiguration _configuration;
 
-    private IConnection _connection;
-    private IChannel _channel;
+    private IConnection? _connection;
+    private IChannel? _channel;
     private readonly string[] _queueNames;
-    private AsyncEventingBasicConsumer? _consumer;
 
-    public event EventHandler<BaseDTO>? MessageReceived;
+    public event EventHandler<string>? MessageReceived;
 
-    public RabbitMQService(ILogger<RabbitMQService> logger, IConfiguration configuration)
+    public RabbitMQService(ILogger<RabbitMQService> logger, IConfiguration configuration, RedisService redisService)
     {
         _logger = logger;
         _configuration = configuration;
+        _redisService = redisService;
         var rabbitConfig = configuration.GetSection("RabbitMQ");
 
         _connectionFactory = new ConnectionFactory()
         {
-          HostName = rabbitConfig["HostName"] ?? "rabbitmq",
+          HostName = rabbitConfig["HostName"] ?? "localhost",
           Port = int.Parse(rabbitConfig["Port"] ?? "5672"),
           UserName = rabbitConfig["UserName"] ?? "guest",
           Password = rabbitConfig["Password"] ?? "guest",
@@ -86,22 +87,15 @@ public class RabbitMQService : IAsyncDisposable
                     Converters = { new DTOJsonConverter(), new JsonStringEnumConverter() }
                 });
 
-                switch (message)
+                var jsonMessage = JsonSerializer.Serialize(message, new JsonSerializerOptions
                 {
-                    case TalonDTO talon:
-                        // работаем с талоном
-                        break;
-                    case WindowDTO window:
-                        // работаем с окном
-                        break;
-                    case QueueDTO queue:
-                        // работаем с очередью
-                        break;
-                }
+                    Converters = { new DTOJsonConverter() }
+                });
 
                 if (message != null)
                 {
-                    MessageReceived?.Invoke(this, message);
+                    MessageReceived?.Invoke(this, jsonMessage);
+                    await _redisService.AddMessage(message, jsonMessage);
 
                     // Подтверждаем обработку сообщения
                     await _channel.BasicAckAsync(ea.DeliveryTag, false, cancellationToken);

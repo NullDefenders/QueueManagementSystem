@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace QueueService.DTO;
+namespace QueueInformer.Models;
 
 public enum WindowsStatus { free, busy };
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.Features;
-using RabbitMqSse.Services;
+using QueueInformer.Serveces;
+using QueueInformer.Services;
 
 namespace QueueInformer
 {
@@ -20,6 +21,7 @@ namespace QueueInformer
             builder.Services.AddSingleton<RabbitMQService>();
             builder.Services.AddSingleton<ISseService, SseService>();
             builder.Services.AddHostedService<RabbitMQBackgroundService>();
+            builder.Services.AddSingleton<RedisService>();
 
             // CORS для тестирования
             builder.Services.AddCors(options =>

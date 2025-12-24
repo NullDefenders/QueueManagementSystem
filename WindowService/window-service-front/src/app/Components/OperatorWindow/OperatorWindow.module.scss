@@ -47,6 +47,10 @@
   border-radius: 50%;
   cursor: pointer;
 
+  &_open {
+    background: var(--blue);
+  }
+
   &:hover {
     opacity: 0.9;
   }

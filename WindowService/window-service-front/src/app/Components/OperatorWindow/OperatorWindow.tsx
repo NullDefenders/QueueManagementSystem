@@ -9,6 +9,32 @@ import styles from "./OperatorWindow.module.scss";
 export const OperatorWindow = () => {
   const defaultWindow = "WINDOW SYSTEM";
   const [currentWindow, setCurrentWindow] = useState(defaultWindow);
+  const [openedWindows, setOpenedWindows] = useState<Set<string>>(new Set());
+
+  const onServcieNameClick = (windowNumber: string, statusStr: string) => {
+    fetch("http://localhost:8084/api/Window", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        windowNumber,
+        status: statusStr === "free" ? 0 : 1,
+      }),
+    }).then(() => {
+      setOpenedWindows((prevOpenedWindows) => {
+        const newSet = new Set(prevOpenedWindows);
+
+        if (statusStr === "free") {
+          newSet.add(windowNumber);
+        } else {
+          newSet.delete(windowNumber);
+        }
+
+        return newSet;
+      });
+    });
+  };
 
   return (
     <main className={styles.operatorWindow}>
@@ -28,18 +54,35 @@ export const OperatorWindow = () => {
           return (
             <button
               key={num}
-              className={styles.windowButton}
-              onClick={() => setCurrentWindow(num)}
+              className={clsx(
+                styles.windowButton,
+                openedWindows.has(num) && styles.windowButton_open
+              )}
+              onClick={() => {
+                setCurrentWindow(num);
+              }}
             >
               {num}
             </button>
           );
         })}
       </div>
-      <button className={clsx(styles.button, styles.button_free)}>
+      <button
+        className={clsx(styles.button, styles.button_free)}
+        onClick={() => {
+          onServcieNameClick(currentWindow, "free");
+        }}
+      >
         Свободен
       </button>
-      <button className={clsx(styles.button, styles.button_busy)}>Занят</button>
+      <button
+        className={clsx(styles.button, styles.button_busy)}
+        onClick={() => {
+          onServcieNameClick(currentWindow, "closed");
+        }}
+      >
+        Закрыть
+      </button>
     </main>
   );
 };
