@@ -15,7 +15,7 @@ export const StepCategories = (props: StepCategoriesProps) => {
 
   useEffect(() => {
     if (inputValue.length === 5) {
-      fetch(`https://localhost:44345/record/${inputValue}`)
+      fetch(`http://localhost:8087/record/${inputValue}`)
         .then((response) => response.json())
         .then((data) => {
           console.log(new Date(data.recordTime));
