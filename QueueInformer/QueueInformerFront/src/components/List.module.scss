@@ -9,6 +9,12 @@
   margin: 0;
 }
 
+.itemContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .item {
   width: 80px;
   display: block;
@@ -21,6 +27,14 @@
   &_call {
     background-color: var(--purple);
   }
+
+  &_withTime {
+    margin-left: 50px;
+  }
+}
+
+.time {
+  color: var(--text);
 }
 
 .callItem {
