@@ -64,6 +64,7 @@
       redis:
         condition: service_healthy
     environment:
+      - TZ=Europe/Moscow
       - RabbitMQ__HostName=rabbitmq
       - RabbitMQ__UserName=admin
       - RabbitMQ__Password=password
