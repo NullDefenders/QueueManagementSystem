@@ -72,7 +72,8 @@
       - Redis__Host=redis
       - Redis__Port=6379
       - Redis__Database=0
-      - ASPNETCORE_URLS=http://0.0.0.0:8085;
+      - ASPNETCORE_URLS=http://+:8085
+      - Settings__GetSettingURL= http://directory-service:8082/api/queues/e5d9f8e3-0fe4-4a37-bce4-968a99fb1c5e/settings
     restart: unless-stopped
 
   directory-service:
@@ -82,7 +83,7 @@
     ports:
       - "8082:8082"
     environment:
-      - ASPNETCORE_URLS=http://0.0.0.0:8082;
+      - ASPNETCORE_URLS=http://+:8082
     restart: unless-stopped
 
   adminpanel-service:
@@ -92,7 +93,7 @@
     ports:
       - "8083:8083"
     environment:
-      - ASPNETCORE_URLS=http://0.0.0.0:8083;
+      - ASPNETCORE_URLS=http://+:8083
       - BackendHost=directory-service
       - BackendPort=8082
     restart: unless-stopped
@@ -114,7 +115,7 @@
         - Redis__Host=redis
         - Redis__Port=6379
         - Redis__Database=1
-        - ASPNETCORE_URLS=http://0.0.0.0:8086;
+        - ASPNETCORE_URLS=http://+:8086
     ports:
       - "8086:8086"
     restart: unless-stopped
@@ -131,7 +132,7 @@
         - RabbitMQ__UserName=admin
         - RabbitMQ__Password=password
         - RabbitMQ__Port=5672
-        - ASPNETCORE_URLS=http://0.0.0.0:8080;
+        - ASPNETCORE_URLS=http://+:8080
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -148,7 +149,7 @@
         - RabbitMQ__UserName=admin
         - RabbitMQ__Password=password
         - RabbitMQ__Port=5672
-        - ASPNETCORE_URLS=http://0.0.0.0:8084;
+        - ASPNETCORE_URLS=http://+:8084
     ports:
       - "8084:8084"
     restart: unless-stopped
