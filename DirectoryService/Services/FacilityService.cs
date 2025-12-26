@@ -56,7 +56,6 @@ namespace DirectoryService.Services
             {
                 try
                 {
-                    // Базовая валидация
                     if (string.IsNullOrWhiteSpace(code))
                         throw new ArgumentException("Код учреждения не может быть пустым");
 
@@ -89,7 +88,6 @@ namespace DirectoryService.Services
             {
                 try
                 {
-                    // Базовая валидация
                     if (string.IsNullOrWhiteSpace(code))
                         throw new ArgumentException("Код учреждения не может быть пустым");
 
