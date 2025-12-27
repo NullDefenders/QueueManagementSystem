@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using QueueService.DTO;
 using QueueService.Factory;
+using QueueService.Helper;
 using QueueService.Services;
 
 namespace QueueService.Domain;
@@ -9,14 +10,14 @@ public class TalonMessageProcessor : IMessageProcessor
 {
   private readonly ILogger<TalonMessageProcessor> _logger;
   private readonly IConfiguration _configuration;
-  private readonly RedisService _redisService;
+  private readonly IQueueStorage _storage;
   private readonly RabbitMQService _rabbitMQService;
 
-  public TalonMessageProcessor(ILogger<TalonMessageProcessor> logger, IConfiguration configuration, RedisService redisService, RabbitMQService rabbitMQService)
+  public TalonMessageProcessor(ILogger<TalonMessageProcessor> logger, IConfiguration configuration, IQueueStorage storage, RabbitMQService rabbitMQService)
   {
     _logger = logger;
     _configuration = configuration;
-    _redisService = redisService;
+    _storage = storage;
     _rabbitMQService = rabbitMQService;
   }
 
@@ -44,18 +45,21 @@ public class TalonMessageProcessor : IMessageProcessor
     {
       if (talon != null && !string.IsNullOrEmpty(talon.TalonNumber) && !string.IsNullOrEmpty(talon.ServiceCode))
       {
-        var window = await _redisService._redisdb.ListRightPopAsync("WINDOWS");
-        if (window.IsNullOrEmpty)
+        var window = await _storage.GetWindowAsync();
+        if (string.IsNullOrEmpty(window))
         {
+          int minutesLimit = _configuration.GetValue<int>("Settings:MinutesAfterPending");
+          var cutoffTime = DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(-minutesLimit));
+          double? pendingTimeSeconds = null;
           if (talon.PendingTime != null)
           {
-            int MinutesAfterPending = _configuration.GetValue<int>("Settings:MinutesAfterPending");
-            double score = talon.PendingTime?.TotalSeconds ?? 0;
-            if (score >= (DateTime.Now.TimeOfDay.TotalSeconds - MinutesAfterPending * 60))
-              await _redisService._redisdb.SortedSetAddAsync("PENDING", talon.TalonNumber, score);
+            pendingTimeSeconds = talon.PendingTime?.TotalSeconds ?? 0;
+            if (pendingTimeSeconds < cutoffTime.TotalSeconds)
+            {
+              pendingTimeSeconds = null;
+            }
           }
-          //        await _redisService._redisdb.ListLeftPushAsync($"TALONS:{talon.ServiceCode}", talon.TalonNumber);
-          await _redisService.AddIfNotExistsAsync("TALONS", talon.TalonNumber);
+          await _storage.AddTalonAsync(talon.TalonNumber, pendingTimeSeconds);
 
         }
         else

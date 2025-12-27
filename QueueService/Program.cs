@@ -1,7 +1,7 @@
 using QueueService.Domain;
 using QueueService.Factory;
+using QueueService.Helper;
 using QueueService.Services;
-using QueueService.Infrastructure.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +21,11 @@ builder.Services.AddSingleton<WindowMessageProcessor>();
 builder.Services.AddSingleton<MessageProcessorFactory>();
 
 builder.Services.AddSingleton<RabbitMQService>();
-builder.Services.AddSingleton<RedisService>();
+builder.Services.AddSingleton<RedisQueueStorage>();
+builder.Services.AddSingleton<MongoQueueStorage>();
+
+var queueStorage = await QueueStorageFactory.CreateAsync(builder.Services.BuildServiceProvider());
+builder.Services.AddSingleton<IQueueStorage>(queueStorage);
 
 builder.Services.AddHostedService<RabbitMQBackgroundService>();
 

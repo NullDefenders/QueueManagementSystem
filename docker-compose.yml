@@ -53,6 +53,47 @@
       timeout: 5s
       retries: 10
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    # Используем entrypoint, чтобы создать файл ключа перед запуском монго
+    entrypoint: >
+      bash -c "
+      if [ ! -f /data/db/keyfile ]; then
+        openssl rand -base64 756 > /data/db/keyfile;
+        chmod 600 /data/db/keyfile;
+        chown 999:999 /data/db/keyfile;
+      fi;
+      exec docker-entrypoint.sh mongod --replSet rs0 --keyFile /data/db/keyfile --bind_ip_all --auth
+      "
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+    healthcheck:
+      test: |
+        mongosh --quiet --username admin --password password123 --authenticationDatabase admin --eval "
+        try {
+          if (rs.status().ok) {
+            quit(0);
+          }
+        } catch (e) {
+          rs.initiate({
+            _id: 'rs0',
+            members: [{ _id: 0, host: 'mongodb:27017' }]
+          });
+          quit(0);
+        }"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
   queue-service:
     build: /QueueService
     container_name: queue-service
@@ -62,6 +103,8 @@
       rabbitmq:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      mongodb:
         condition: service_healthy
     environment:
       - TZ=Europe/Moscow
@@ -73,7 +116,8 @@
       - Redis__Port=6379
       - Redis__Database=0
       - ASPNETCORE_URLS=http://+:8085
-      - Settings__GetSettingURL= http://directory-service:8082/api/queues/e5d9f8e3-0fe4-4a37-bce4-968a99fb1c5e/settings
+      - Settings__GetSettingURL=http://directory-service:8082/api/queues/e5d9f8e3-0fe4-4a37-bce4-968a99fb1c5e/settings
+      - Mongo__ConnectionString=mongodb://admin:password123@mongodb:27017/?replicaSet=rs0&directConnection=true
     restart: unless-stopped
 
   directory-service:
@@ -127,12 +171,15 @@
     depends_on:
         rabbitmq:
           condition: service_healthy
+        mongodb:
+          condition: service_healthy
     environment:
         - RabbitMQ__HostName=rabbitmq
         - RabbitMQ__UserName=admin
         - RabbitMQ__Password=password
         - RabbitMQ__Port=5672
         - ASPNETCORE_URLS=http://+:8080
+        - TicketDatabaseSettings__ConnectionString=mongodb://admin:password123@mongodb:27017/?replicaSet=rs0&directConnection=true
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -159,18 +206,37 @@
       context: ./PreRegistrationService
       dockerfile: Dockerfile
     container_name: preregistration-service
+    depends_on:
+        mongodb:
+          condition: service_healthy
     ports:
       - "8087:8087"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8087
-      - ConnectionStrings__DefaultConnection=mongodb://admin:123@90.156.171.154:27018/prereg?authSource=admin&connectTimeoutMS=30000&serverSelectionTimeoutMS=30000&socketTimeoutMS=30000
+      - ConnectionStrings__DefaultConnection=mongodb://admin:password123@mongodb:27017/prereg?authSource=admin&connectTimeoutMS=30000&serverSelectionTimeoutMS=30000&socketTimeoutMS=30000&replicaSet=rs0&directConnection=true
       - ASPNETCORE_STARTUP_ERROR_CONTINUE=true
-    restart: "no"
-    stdin_open: true
-    tty: true 
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    ports:
+      - 8088:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password123@mongodb:27017?replicaSet=rs0&directConnection=true&authSource=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
 
 volumes:
+  mongo-data:
+    driver: local
+  mongo-config:
+    driver: local
   rabbitmq_data:
     driver: local
   rabbitmq_logs:

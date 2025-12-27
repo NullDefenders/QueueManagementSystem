@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using QueueService.DTO;
+using QueueService.Helper;
 using QueueService.Services;
 using StackExchange.Redis;
 
@@ -10,14 +11,14 @@ public class WindowMessageProcessor : IMessageProcessor
 {
   private readonly ILogger<WindowMessageProcessor> _logger;
   private readonly IConfiguration _configuration;
-  private readonly RedisService _redisService;
+  private readonly IQueueStorage _storage;
   private readonly RabbitMQService _rabbitMQService;
 
-  public WindowMessageProcessor(ILogger<WindowMessageProcessor> logger, IConfiguration configuration, RedisService redisService, RabbitMQService rabbitMQService)
+  public WindowMessageProcessor(ILogger<WindowMessageProcessor> logger, IConfiguration configuration, IQueueStorage storage, RabbitMQService rabbitMQService)
   {
     _logger = logger;
     _configuration = configuration;
-    _redisService = redisService;
+    _storage = storage;
     _rabbitMQService = rabbitMQService;
   }
 
@@ -48,18 +49,11 @@ public class WindowMessageProcessor : IMessageProcessor
       {
         if (window.Status == WindowsStatus.free)
         {
-          var result = await _redisService.GetTalon();
-
-          String talon = "";
-
-          if (result.Length > 0)
-          {
-            talon = result[0].ToString();
-          }
+          var talon = await _storage.GetNextTalonAsync();
 
           if (String.IsNullOrEmpty(talon))
           {
-            await _redisService.AddIfNotExistsAsync("WINDOWS", window.WindowNumber);
+            await _storage.AddWindowAsync(window.WindowNumber);
           }
           else
           {
@@ -69,7 +63,7 @@ public class WindowMessageProcessor : IMessageProcessor
         }
         else
         {
-          await _redisService._redisdb.ListRemoveAsync("WINDOWS", window.WindowNumber);
+          await _storage.RemoveWindowAsync(window.WindowNumber);
         }
         _logger.LogInformation($"Windows processed: {message}");
       }

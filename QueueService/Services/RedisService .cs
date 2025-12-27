@@ -3,16 +3,6 @@ using StackExchange.Redis;
 
 namespace QueueService.Services;
 
-public interface IRedisService
-{
-  Task<T> GetAsync<T>(string key);
-  Task SetAsync<T>(string key, T value, TimeSpan? expiry = null);
-  Task<bool> RemoveAsync(string key);
-  Task<bool> ExistsAsync(string key);
-  Task<TimeSpan?> GetTimeToLiveAsync(string key);
-}
-
-//public class RedisService : IRedisService, IAsyncDisposable
 public class RedisService : IAsyncDisposable
 {
   private readonly ILogger<RedisService> _logger;
@@ -37,7 +27,8 @@ public class RedisService : IAsyncDisposable
     _redisConnection = ConnectionMultiplexer.Connect(options);
     _redisdb = _redisConnection.GetDatabase();
   }
-  public async Task<RedisResult> AddIfNotExistsAsync(String Key, String Id) {
+  private async Task<RedisResult> AddIfNotExistsAsync(String Key, String Id)
+  {
     string lua = @"-- Скрипт для атомарного добавления значения в список, 
       -- только если он там еще не присутствует.
 
@@ -71,6 +62,14 @@ public class RedisService : IAsyncDisposable
         new RedisKey[] { Key },
         new RedisValue[] { Id }
     );
+  }
+  public async Task AddTalon(string TalonNumber, double? PendingTime)
+  {
+    if (PendingTime != null)
+    {
+      await _redisdb.SortedSetAddAsync("PENDING", TalonNumber, (double)PendingTime);
+    }
+    await AddIfNotExistsAsync("TALONS", TalonNumber);
   }
 
   public async Task<RedisResult[]> GetTalon()
@@ -178,6 +177,21 @@ public class RedisService : IAsyncDisposable
         new RedisKey[] { "TALONS", "PENDING", "counter" },
         new RedisValue[] { _configuration.GetValue<int>("Settings:PendingCount"), DateTime.Now.TimeOfDay.TotalSeconds, _configuration.GetValue<int>("Settings:MinutesBeforePending") * 60 }
     ) ?? [];
+  }
+
+  public async Task AddWindow(string WindowNumber)
+  {
+    await AddIfNotExistsAsync("WINDOWS", WindowNumber);
+  }
+
+  public async Task<RedisValue> GetWindow()
+  {
+    return await _redisdb.ListRightPopAsync("WINDOWS");
+  }
+
+  public async Task DelWindow(string WindowNumber)
+  {
+    await _redisdb.ListRemoveAsync("WINDOWS", WindowNumber);
   }
 
   public async ValueTask DisposeAsync()

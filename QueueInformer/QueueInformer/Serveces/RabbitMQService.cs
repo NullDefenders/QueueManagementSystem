@@ -84,6 +84,7 @@ public class RabbitMQService : IAsyncDisposable
                 var message = JsonSerializer.Deserialize<BaseDTO>(messageJson, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true,
+                    AllowTrailingCommas = true,
                     Converters = { new DTOJsonConverter(), new JsonStringEnumConverter() }
                 });
 
